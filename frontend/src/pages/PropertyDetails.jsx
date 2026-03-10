@@ -1,0 +1,323 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  MapPin,
+  Ruler,
+  Building,
+  ArrowLeft,
+  Share2,
+  Heart,
+  ShieldCheck,
+  Grid,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "../components/LoadingSpinner";
+
+export default function PropertyDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showAllPhotos, setShowAllPhotos] = useState(false);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/api/listings/${id}`)
+      .then((res) => {
+        setProperty(res.data);
+        setLoading(false);
+      })
+      .catch((err) => console.error(err));
+  }, [id]);
+
+  if (loading) return <LoadingSpinner fullScreen />;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="bg-gradient-to-b from-white via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-950 dark:to-black min-h-screen pb-24 md:pb-12 transition-colors"
+    >
+      {/* PHOTO MODAL */}
+      <AnimatePresence>
+        {showAllPhotos && (
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-y-auto"
+          >
+            <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 flex justify-between items-center border-b border-blue-100 dark:border-slate-800 z-10">
+              <button
+                onClick={() => setShowAllPhotos(false)}
+                className="p-2 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-full"
+              >
+                <ArrowLeft />
+              </button>
+
+              <h2 className="font-bold dark:text-white">
+                All Photos ({property.images.length})
+              </h2>
+
+              <div className="w-10"></div>
+            </div>
+
+            <div className="max-w-3xl mx-auto p-4 space-y-4">
+              {property.images.map((img, i) => (
+                <motion.img
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  key={i}
+                  src={img}
+                  className="w-full rounded-2xl shadow-lg"
+                  alt={`View ${i}`}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MOBILE ACTION BAR */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-blue-100 dark:border-slate-800 p-4 z-50 flex items-center justify-between md:hidden">
+        <div>
+          <p className="text-[10px] text-slate-400 uppercase font-bold">
+            Price
+          </p>
+
+          <p className="text-xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            ${property.price.toLocaleString()}
+          </p>
+        </div>
+
+        <button className="bg-gradient-to-r from-blue-600 to-violet-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-blue-500/40 transition">
+          Contact
+        </button>
+      </div>
+
+      {/* TOP NAV */}
+      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-blue-600"
+        >
+          <ArrowLeft size={20} />
+          <span className="hidden sm:inline">Back</span>
+        </button>
+
+        <div className="flex gap-2">
+          <button className="p-2 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-full">
+            <Share2 size={20} />
+          </button>
+
+          <button className="p-2 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-full">
+            <Heart size={20} />
+          </button>
+        </div>
+      </div>
+
+      {/* GALLERY */}
+      <div className="max-w-7xl mx-auto md:px-4 mb-8">
+        {/* MOBILE */}
+        <div className="flex md:hidden overflow-x-auto snap-x snap-mandatory relative h-[300px]">
+          {property.images.map((img, i) => (
+            <div key={i} className="min-w-full h-full snap-start relative">
+              <img src={img} className="w-full h-full object-cover" />
+
+              <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold">
+                {i + 1} / {property.images.length}
+              </div>
+            </div>
+          ))}
+
+          <button
+            onClick={() => setShowAllPhotos(true)}
+            className="absolute bottom-4 left-4 bg-white/90 dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg"
+          >
+            <Grid size={14} /> View All
+          </button>
+        </div>
+
+        {/* DESKTOP GRID */}
+        <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[450px] rounded-3xl overflow-hidden shadow-lg relative">
+          <div
+            className="col-span-2 row-span-2 overflow-hidden group cursor-pointer"
+            onClick={() => setShowAllPhotos(true)}
+          >
+            <img
+              src={property.images?.[0]}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          </div>
+
+          {property.images.slice(1, 4).map((img, i) => (
+            <div
+              key={i}
+              className="overflow-hidden group cursor-pointer"
+              onClick={() => setShowAllPhotos(true)}
+            >
+              <img
+                src={img}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            </div>
+          ))}
+
+          <div
+            className="col-span-2 overflow-hidden relative group cursor-pointer"
+            onClick={() => setShowAllPhotos(true)}
+          >
+            <img
+              src={property.images?.[3]}
+              className="w-full h-full object-cover"
+            />
+
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <div className="text-white text-center">
+                <Grid className="mx-auto mb-2" size={24} />
+                <span className="font-bold text-sm tracking-widest uppercase">
+                  View All {property.images.length} Photos
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* DETAILS */}
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* LEFT */}
+        <div className="lg:col-span-2">
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase">
+                {property.propertyType}
+              </span>
+
+              <span
+                className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase ${
+                  property.status === "Available"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {property.status}
+              </span>
+            </div>
+
+            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-2">
+              {property.title}
+            </h1>
+
+            <p className="flex items-center text-slate-500 dark:text-slate-400 text-lg">
+              <MapPin size={20} className="mr-2 text-blue-600" />
+              {property.location}
+            </p>
+          </div>
+
+          {/* FEATURES */}
+          <div className="flex gap-4 py-8 border-y border-blue-100 dark:border-slate-800 mb-10 overflow-x-auto">
+            <Feature
+              icon={<Ruler />}
+              label="Total Area"
+              value={property.size}
+            />
+            <Feature
+              icon={<Building />}
+              label="Structure"
+              value={property.propertyType}
+            />
+            <Feature
+              icon={<ShieldCheck className="text-green-500" />}
+              label="Verification"
+              value="Approved"
+            />
+          </div>
+
+          {/* DESCRIPTION */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+              The Property
+            </h3>
+
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg whitespace-pre-line">
+              {property.description}
+            </p>
+          </div>
+        </div>
+
+        {/* SIDEBAR */}
+        <div className="lg:col-span-1">
+          <div className="lg:sticky lg:top-24">
+            <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-2xl dark:shadow-black/30">
+              <p className="text-xs font-bold text-slate-400 uppercase mb-2">
+                Asking Price
+              </p>
+
+              <h2 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-8">
+                ${property.price.toLocaleString()}
+              </h2>
+
+              <div className="space-y-4 mb-10">
+                <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-2xl font-black text-lg hover:shadow-2xl hover:shadow-blue-500/40 transition">
+                  Contact Agent
+                </button>
+
+                <button className="w-full border border-blue-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 py-5 rounded-2xl font-black text-lg hover:bg-blue-50 dark:hover:bg-slate-800 transition">
+                  Download Brochure
+                </button>
+              </div>
+
+              <div className="pt-8 border-t border-blue-100 dark:border-slate-800">
+                <h3 className="text-xl font-black mb-6 dark:text-white">
+                  Schedule a Visit
+                </h3>
+
+                <form className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    className="w-full p-4 bg-blue-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl outline-none"
+                  />
+
+                  <textarea
+                    placeholder="Your Message..."
+                    className="w-full p-4 bg-blue-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl outline-none h-24"
+                  />
+
+                  <button
+                    type="button"
+                    className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 rounded-xl font-bold hover:opacity-90 transition"
+                  >
+                    Request Visit
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function Feature({ icon, label, value }) {
+  return (
+    <div className="flex-shrink-0 flex items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-blue-100 dark:border-slate-800 shadow-sm">
+      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center rounded-xl text-white">
+        {icon}
+      </div>
+
+      <div>
+        <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">
+          {label}
+        </p>
+
+        <p className="font-black text-slate-800 dark:text-slate-200 text-sm">
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
