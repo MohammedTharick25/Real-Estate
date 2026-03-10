@@ -10,17 +10,34 @@ export default function Signup() {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (loading) return;
+
     try {
+      setLoading(true);
+
       await axios.post("http://localhost:5000/api/auth/signup", formData);
+
       alert("Account created! Please login.");
       navigate("/login");
     } catch (err) {
+      console.error(err);
       alert(err.response?.data?.error || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,36 +62,39 @@ export default function Signup() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
+              name="name"
               placeholder="Full Name"
               required
+              value={formData.name}
+              onChange={handleChange}
               className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 ring-brand/20 text-slate-900 dark:text-white placeholder:text-slate-400"
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
             />
 
             <input
               type="email"
+              name="email"
               placeholder="Email Address"
               required
+              value={formData.email}
+              onChange={handleChange}
               className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 ring-brand/20 text-slate-900 dark:text-white placeholder:text-slate-400"
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
             />
 
             <input
               type="password"
+              name="password"
               placeholder="Password"
               required
+              value={formData.password}
+              onChange={handleChange}
               className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 ring-brand/20 text-slate-900 dark:text-white placeholder:text-slate-400"
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
             />
 
-            <button className="w-full bg-brand text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-dark transition-all shadow-lg bg-blue-950">
-              Sign Up
+            <button
+              disabled={loading}
+              className="w-full bg-blue-950 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all active:scale-95 disabled:opacity-60"
+            >
+              {loading ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
 

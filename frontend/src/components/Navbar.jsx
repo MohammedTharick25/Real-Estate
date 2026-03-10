@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   User,
@@ -56,11 +56,14 @@ export default function Navbar() {
     user?.user?.image ||
     `https://ui-avatars.com/api/?name=${user?.user?.name || "User"}&background=2563eb&color=fff`;
 
-  const navLinks = [
-    { name: "Home", path: "/", icon: <Home size={20} /> },
-    { name: "Properties", path: "/listings", icon: <List size={20} /> },
-    { name: "Contact", path: "/contact", icon: <Phone size={20} /> },
-  ];
+  const navLinks = useMemo(
+    () => [
+      { name: "Home", path: "/", icon: <Home size={20} /> },
+      { name: "Properties", path: "/listings", icon: <List size={20} /> },
+      { name: "Contact", path: "/contact", icon: <Phone size={20} /> },
+    ],
+    [],
+  );
 
   const isActive = (path) =>
     path === "/"
@@ -78,6 +81,12 @@ export default function Navbar() {
   const itemVariants = {
     closed: { opacity: 0, x: 20 },
     opened: { opacity: 1, x: 0 },
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsMobileMenuOpen(false);
+    navigate("/");
   };
 
   return (
@@ -126,12 +135,17 @@ export default function Navbar() {
           {/* Profile */}
           {user ? (
             <button
+              aria-label="Open profile"
               onClick={() => navigate("/profile")}
               className="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-700 overflow-hidden hover:border-blue-600 transition"
             >
               <img
                 src={profileImg}
                 alt="Profile"
+                onError={(e) => {
+                  e.target.src =
+                    "https://ui-avatars.com/api/?name=User&background=2563eb&color=fff";
+                }}
                 className="w-full h-full object-cover"
               />
             </button>
@@ -192,7 +206,7 @@ export default function Navbar() {
               </div>
 
               {/* Links */}
-              <div className="flex-1 px-4 py-6 overflow-y-auto hide-scrollbar flex flex-col gap-2">
+              <div className="flex-1 px-4 py-6 overflow-y-auto flex flex-col gap-2">
                 {navLinks.map((link) => (
                   <motion.div key={link.path} variants={itemVariants}>
                     <Link
@@ -234,7 +248,7 @@ export default function Navbar() {
                     )}
 
                     <button
-                      onClick={logout}
+                      onClick={handleLogout}
                       className="flex items-center gap-4 p-4 text-red-500 font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl"
                     >
                       <LogOut size={20} /> Logout

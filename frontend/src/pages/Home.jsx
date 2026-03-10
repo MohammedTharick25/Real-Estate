@@ -9,6 +9,12 @@ import { Link } from "react-router-dom";
 export default function Home() {
   const [properties, setProperties] = useState([]);
 
+  const [location, setLocation] = useState("");
+  const [type, setType] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [sort, setSort] = useState("newest");
+
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/listings")
@@ -16,9 +22,27 @@ export default function Home() {
       .catch((err) => console.log(err));
   }, []);
 
+  const handleSearch = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/listings", {
+        params: {
+          location,
+          type,
+          minPrice,
+          maxPrice,
+          sort,
+        },
+      });
+
+      setProperties(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="overflow-hidden bg-gradient-to-b from-white via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-950 dark:to-black">
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
         <motion.div
           initial={{ scale: 1.2 }}
@@ -35,16 +59,16 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-br from-blue-950/90 via-indigo-900/70 to-purple-900/60" />
         </motion.div>
 
-        <div className="relative z-10 text-center px-4 max-w-5xl">
+        <div className="relative z-10 text-center px-4 max-w-6xl">
           <motion.h1
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight"
+            className="text-5xl md:text-7xl font-black text-white mb-6"
           >
             Luxury Living <br />
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Redefined.
+              Redefined
             </span>
           </motion.h1>
 
@@ -63,26 +87,62 @@ export default function Home() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="bg-white/20 backdrop-blur-xl p-3 rounded-2xl shadow-2xl shadow-blue-900/40 border border-blue-400/30 flex flex-col md:flex-row gap-2 max-w-4xl mx-auto"
+            className="bg-white/20 backdrop-blur-xl p-4 rounded-2xl shadow-2xl border border-blue-400/30 grid md:grid-cols-6 gap-3 max-w-6xl mx-auto"
           >
-            <div className="flex-1 flex items-center bg-white dark:bg-slate-800 rounded-xl px-4 py-2">
-              <Search className="text-slate-400 mr-2" />
-
+            <div className="flex items-center bg-white dark:bg-slate-800 rounded-lg px-3">
+              <Search className="text-slate-400 mr-2" size={18} />
               <input
                 type="text"
-                placeholder="Enter Location..."
-                className="w-full p-2 outline-none bg-transparent text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                placeholder="Location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full p-3 outline-none bg-transparent"
               />
             </div>
 
-            <select className="bg-white dark:bg-slate-800 rounded-xl px-4 py-3 outline-none font-bold text-slate-700 dark:text-slate-200">
-              <option>Property Type</option>
-              <option>Land</option>
-              <option>House</option>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="p-3 rounded-lg outline-none dark:bg-slate-800 dark:text-white"
+            >
+              <option value="">Property Type</option>
+              <option value="Land">Land</option>
+              <option value="House">House</option>
+              <option value="Apartment">Apartment</option>
             </select>
 
-            <button className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white px-10 py-4 rounded-xl font-bold transition-all shadow-xl hover:shadow-blue-600/40">
-              Search Now
+            <input
+              type="number"
+              placeholder="Min Price"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              className="p-3 rounded-lg outline-none dark:bg-slate-800 dark:text-white"
+            />
+
+            <input
+              type="number"
+              placeholder="Max Price"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              className="p-3 rounded-lg outline-none dark:bg-slate-800 dark:text-white"
+            />
+
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="p-3 rounded-lg outline-none dark:bg-slate-800 dark:text-white"
+            >
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="price_low">Price Low → High</option>
+              <option value="price_high">Price High → Low</option>
+            </select>
+
+            <button
+              onClick={handleSearch}
+              className="bg-gradient-to-r from-blue-600 to-violet-600 text-white font-bold rounded-lg px-6 py-3 hover:shadow-xl transition-all active:scale-95"
+            >
+              Search
             </button>
           </motion.div>
         </div>
@@ -109,10 +169,9 @@ export default function Home() {
               key={i}
               className="flex items-center gap-3 font-bold text-slate-700 dark:text-slate-300"
             >
-              <span className="p-3 bg-gradient-to-br from-blue-50 to-indigo-100 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-900 rounded-full">
+              <span className="p-3 bg-blue-50 dark:bg-slate-800 rounded-full">
                 {badge.icon}
               </span>
-
               {badge.title}
             </div>
           ))}
@@ -134,7 +193,7 @@ export default function Home() {
 
           <Link
             to="/listings"
-            className="hidden sm:inline-flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 transition"
+            className="hidden sm:inline-flex items-center gap-1 text-sm text-slate-600 hover:text-blue-600"
           >
             <span className="font-bold flex items-center gap-1">
               View All <ArrowRight size={18} />
@@ -142,64 +201,42 @@ export default function Home() {
           </Link>
         </div>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={{
-            visible: { transition: { staggerChildren: 0.2 } },
-            hidden: {},
-          }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-10"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {properties.map((p) => (
-            <motion.div
-              key={p._id}
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
-              <PropertyCard property={p} />
-            </motion.div>
+            <PropertyCard key={p._id} property={p} />
           ))}
-        </motion.div>
+        </div>
       </section>
 
-      {/* TESTIMONIALS */}
       <Testimonials />
 
-      {/* CTA SECTION */}
+      {/* CTA */}
       <section className="max-w-7xl mx-auto px-4 py-20">
-        <div className="bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
-          <div className="absolute top-0 left-0 w-full h-full bg-white/5 pointer-events-none" />
+        <div className="bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 rounded-[3rem] p-12 text-center">
+          <h2 className="text-4xl font-black text-white mb-6">
+            Invest in Your Future Today
+          </h2>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="relative z-10"
-          >
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-              Invest in Your Future <br />
-              Today.
-            </h2>
+          <p className="text-slate-300 max-w-xl mx-auto mb-10">
+            Join thousands of investors securing premium land and homes through
+            our verified platform.
+          </p>
 
-            <p className="text-slate-300 max-w-xl mx-auto mb-10 text-lg">
-              Join thousands of investors securing premium land and homes
-              through our verified platform.
-            </p>
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <Link
+              to="/listings"
+              className="bg-white text-purple-500 px-10 py-4 rounded-2xl font-bold"
+            >
+              Browse Properties
+            </Link>
 
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/40 transition-all">
-                Browse Properties
-              </button>
-
-              <button className="bg-white/10 text-white border border-white/30 backdrop-blur-md px-10 py-4 rounded-2xl font-bold text-lg hover:bg-white/20 transition-all">
-                Contact Agent
-              </button>
-            </div>
-          </motion.div>
+            <Link
+              to="/contact"
+              className="bg-blue-700 text-white px-10 py-4 rounded-2xl font-bold"
+            >
+              Contact Agent
+            </Link>
+          </div>
         </div>
       </section>
     </div>

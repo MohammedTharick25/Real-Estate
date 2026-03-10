@@ -32,6 +32,12 @@ export default function PropertyDetails() {
   }, [id]);
 
   if (loading) return <LoadingSpinner fullScreen />;
+  if (!property) return <p className="text-center py-20">Property not found</p>;
+
+  const mediaList = [
+    ...(property.videos?.[0] ? [property.videos[0]] : []),
+    ...(property.images || []),
+  ];
 
   return (
     <motion.div
@@ -39,7 +45,7 @@ export default function PropertyDetails() {
       animate={{ opacity: 1 }}
       className="bg-gradient-to-b from-white via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-950 dark:to-black min-h-screen pb-24 md:pb-12 transition-colors"
     >
-      {/* PHOTO MODAL */}
+      {/* PHOTO / VIDEO MODAL */}
       <AnimatePresence>
         {showAllPhotos && (
           <motion.div
@@ -57,44 +63,38 @@ export default function PropertyDetails() {
               </button>
 
               <h2 className="font-bold dark:text-white">
-                All Photos ({property.images.length})
+                Media ({mediaList.length})
               </h2>
 
               <div className="w-10"></div>
             </div>
 
             <div className="max-w-3xl mx-auto p-4 space-y-4">
-              {property.images.map((img, i) => (
-                <motion.img
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  key={i}
-                  src={img}
-                  className="w-full rounded-2xl shadow-lg"
-                  alt={`View ${i}`}
-                />
-              ))}
+              {mediaList.map((media, i) => {
+                if (i === 0 && property.videos?.[0]) {
+                  return (
+                    <video
+                      key={i}
+                      src={media}
+                      controls
+                      className="w-full rounded-2xl shadow-lg"
+                    />
+                  );
+                } else {
+                  return (
+                    <img
+                      key={i}
+                      src={media}
+                      className="w-full rounded-2xl shadow-lg"
+                      alt={`Media ${i}`}
+                    />
+                  );
+                }
+              })}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* MOBILE ACTION BAR */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-blue-100 dark:border-slate-800 p-4 z-50 flex items-center justify-between md:hidden">
-        <div>
-          <p className="text-[10px] text-slate-400 uppercase font-bold">
-            Price
-          </p>
-
-          <p className="text-xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            ${property.price.toLocaleString()}
-          </p>
-        </div>
-
-        <button className="bg-gradient-to-r from-blue-600 to-violet-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-blue-500/40 transition">
-          Contact
-        </button>
-      </div>
 
       {/* TOP NAV */}
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -119,17 +119,26 @@ export default function PropertyDetails() {
 
       {/* GALLERY */}
       <div className="max-w-7xl mx-auto md:px-4 mb-8">
-        {/* MOBILE */}
         <div className="flex md:hidden overflow-x-auto snap-x snap-mandatory relative h-[300px]">
-          {property.images.map((img, i) => (
-            <div key={i} className="min-w-full h-full snap-start relative">
-              <img src={img} className="w-full h-full object-cover" />
-
-              <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold">
-                {i + 1} / {property.images.length}
+          {mediaList.map((media, i) =>
+            i === 0 && property.videos?.[0] ? (
+              <div key={i} className="min-w-full h-full snap-start relative">
+                <video
+                  src={media}
+                  className="w-full h-full object-cover"
+                  controls
+                />
               </div>
-            </div>
-          ))}
+            ) : (
+              <div key={i} className="min-w-full h-full snap-start relative">
+                <img
+                  src={media}
+                  className="w-full h-full object-cover"
+                  alt=""
+                />
+              </div>
+            ),
+          )}
 
           <button
             onClick={() => setShowAllPhotos(true)}
@@ -139,53 +148,43 @@ export default function PropertyDetails() {
           </button>
         </div>
 
-        {/* DESKTOP GRID */}
+        {/* DESKTOP */}
         <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-3 h-[450px] rounded-3xl overflow-hidden shadow-lg relative">
-          <div
-            className="col-span-2 row-span-2 overflow-hidden group cursor-pointer"
-            onClick={() => setShowAllPhotos(true)}
-          >
-            <img
-              src={property.images?.[0]}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-          </div>
-
-          {property.images.slice(1, 4).map((img, i) => (
+          {mediaList.slice(0, 5).map((media, i) => (
             <div
               key={i}
-              className="overflow-hidden group cursor-pointer"
+              className={`overflow-hidden group cursor-pointer ${
+                i === 0 ? "col-span-2 row-span-2" : ""
+              }`}
               onClick={() => setShowAllPhotos(true)}
             >
-              <img
-                src={img}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+              {i === 0 && property.videos?.[0] ? (
+                <video
+                  src={media}
+                  className="w-full h-full object-cover"
+                  controls
+                />
+              ) : (
+                <img
+                  src={media}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  alt={`Media ${i}`}
+                />
+              )}
+
+              {i === 4 && mediaList.length > 5 && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">
+                    +{mediaList.length - 5} More
+                  </span>
+                </div>
+              )}
             </div>
           ))}
-
-          <div
-            className="col-span-2 overflow-hidden relative group cursor-pointer"
-            onClick={() => setShowAllPhotos(true)}
-          >
-            <img
-              src={property.images?.[3]}
-              className="w-full h-full object-cover"
-            />
-
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <div className="text-white text-center">
-                <Grid className="mx-auto mb-2" size={24} />
-                <span className="font-bold text-sm tracking-widest uppercase">
-                  View All {property.images.length} Photos
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* DETAILS */}
+      {/* DETAILS SECTION (unchanged) */}
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* LEFT */}
         <div className="lg:col-span-2">
@@ -247,7 +246,7 @@ export default function PropertyDetails() {
           </div>
         </div>
 
-        {/* SIDEBAR */}
+        {/* SIDEBAR (unchanged) */}
         <div className="lg:col-span-1">
           <div className="lg:sticky lg:top-24">
             <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-2xl dark:shadow-black/30">
@@ -256,7 +255,7 @@ export default function PropertyDetails() {
               </p>
 
               <h2 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-8">
-                ${property.price.toLocaleString()}
+                ₹{property.price.toLocaleString()}
               </h2>
 
               <div className="space-y-4 mb-10">

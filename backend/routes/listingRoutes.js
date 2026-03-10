@@ -56,13 +56,54 @@ router.patch("/:id/status", async (req, res) => {
 // GET All Listings
 router.get("/", async (req, res) => {
   try {
-    const { type } = req.query;
-    let query = {};
-    if (type) query.propertyType = type;
+    const { location, type, minPrice, maxPrice, status, amenities, sort } =
+      req.query;
 
-    const listings = await Listing.find(query).sort({ createdAt: -1 });
+    let query = {};
+
+    // LOCATION SEARCH
+    if (location) {
+      query.location = { $regex: location, $options: "i" };
+    }
+
+    // PROPERTY TYPE
+    if (type) {
+      query.propertyType = type;
+    }
+
+    // STATUS
+    if (status) {
+      query.status = status;
+    }
+
+    // PRICE RANGE
+    if (minPrice || maxPrice) {
+      query.price = {};
+
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // AMENITIES FILTER
+    if (amenities) {
+      const amenitiesArray = amenities.split(",");
+      query.amenities = { $in: amenitiesArray };
+    }
+
+    // SORTING
+    let sortOption = { createdAt: -1 };
+
+    if (sort === "price_low") sortOption = { price: 1 };
+    if (sort === "price_high") sortOption = { price: -1 };
+    if (sort === "newest") sortOption = { createdAt: -1 };
+    if (sort === "oldest") sortOption = { createdAt: 1 };
+    if (sort === "size") sortOption = { size: -1 };
+
+    const listings = await Listing.find(query).sort(sortOption);
+
     res.json(listings);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

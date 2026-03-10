@@ -45,7 +45,7 @@ export default function AdminDashboard() {
       });
       fetchListings();
     } catch (err) {
-      alert("Failed to update status");
+      alert("Failed to update status", err.message);
     }
   };
 
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
 
       {/* Sidebar */}
       <AnimatePresence>
-        {(sidebarOpen || window.innerWidth > 768) && (
+        {(sidebarOpen || window.innerWidth >= 768) && (
           <motion.div
             initial={{ x: -200 }}
             animate={{ x: 0 }}
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">
-                    Price ($)
+                    Price (₹)
                   </label>
                   <input
                     type="number"
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
 
                 <button
                   disabled={isUploading}
-                  className="md:col-span-2 w-full py-5 bg-blue-900 text-white rounded-2xl font-bold text-lg hover:shadow-2xl transition-all disabled:bg-slate-300"
+                  className="md:col-span-2 w-full py-5 bg-blue-900 text-white rounded-2xl font-bold text-lg hover:shadow-2xl transition-all disabled:bg-slate-300 hover:cursor-pointer"
                 >
                   {isUploading ? "Uploading..." : "Publish Property"}
                 </button>
