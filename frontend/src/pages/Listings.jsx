@@ -1,21 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import PropertyCard from "../components/PropertyCard";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { debounce } from "lodash";
 
 export default function Listings() {
   const [properties, setProperties] = useState([]);
   const [filter, setFilter] = useState({ type: "", search: "" });
+  const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Debounced fetch function
-  const fetchProperties = debounce(async (filter) => {
+  const debounceRef = useRef(null);
+
+  const fetchProperties = async (currentFilter) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (filter.type) params.append("type", filter.type);
-      if (filter.search) params.append("location", filter.search);
+      if (currentFilter.type) params.append("type", currentFilter.type);
+      // Ensure your Backend is looking for 'location'
+      if (currentFilter.search) params.append("location", currentFilter.search);
 
       const res = await axios.get(
         `http://localhost:5000/api/listings?${params.toString()}`,
@@ -26,20 +28,20 @@ export default function Listings() {
     } finally {
       setLoading(false);
     }
-  }, 500); // 500ms delay after user stops typing
+  };
 
-  // Run fetch whenever filter changes
   useEffect(() => {
-    fetchProperties(filter);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    // Cleanup debounce on unmount
-    return () => fetchProperties.cancel();
+    debounceRef.current = setTimeout(() => {
+      fetchProperties(filter);
+    }, 400);
+
+    return () => clearTimeout(debounceRef.current);
   }, [filter]);
 
-  if (loading) return <LoadingSpinner fullScreen />;
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-950 dark:to-black transition-colors">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-950 dark:to-black">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-3xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -50,14 +52,21 @@ export default function Listings() {
             <input
               type="text"
               placeholder="Search by location..."
-              value={filter.search}
-              onChange={(e) => setFilter({ ...filter, search: e.target.value })}
-              className="border border-blue-200 dark:border-slate-700 p-3 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                // Trigger the debounced effect by updating filter
+                setFilter((prev) => ({ ...prev, search: e.target.value }));
+              }}
+              className="border border-blue-200 dark:border-slate-700 p-3 rounded-xl bg-white dark:bg-slate-800"
             />
 
             <select
-              className="border border-blue-200 dark:border-slate-700 p-3 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) => setFilter({ ...filter, type: e.target.value })}
+              value={filter.type}
+              onChange={(e) =>
+                setFilter((prev) => ({ ...prev, type: e.target.value }))
+              }
+              className="border border-blue-200 dark:border-slate-700 p-3 rounded-xl bg-white dark:bg-slate-800"
             >
               <option value="">All Types</option>
               <option value="Land">Land</option>
@@ -67,14 +76,16 @@ export default function Listings() {
           </div>
         </div>
 
-        {properties.length === 0 ? (
+        {/* FIX: Instead of returning early, we conditionally render the content. 
+           This prevents the search bar from disappearing.
+        */}
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <LoadingSpinner />
+          </div>
+        ) : properties.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-lg text-slate-500 dark:text-slate-400">
-              No properties found.
-            </p>
-            <p className="text-sm text-slate-400 mt-2">
-              Try changing filters or search terms.
-            </p>
+            <p className="text-lg text-slate-500">No properties found.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">

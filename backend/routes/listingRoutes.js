@@ -61,30 +61,29 @@ router.get("/", async (req, res) => {
 
     let query = {};
 
-    // LOCATION SEARCH
-    if (location) {
-      query.location = { $regex: location, $options: "i" };
+    // LOCATION filter (partial match, escape special regex chars)
+    if (location && location.trim() !== "") {
+      const escaped = location.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      query.location = { $regex: escaped, $options: "i" };
     }
 
-    // PROPERTY TYPE
-    if (type) {
-      query.propertyType = type;
+    // PROPERTY TYPE filter (partial match)
+    if (type && type.trim() !== "") {
+      const escapedType = type.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      query.propertyType = { $regex: escapedType, $options: "i" };
     }
 
-    // STATUS
-    if (status) {
-      query.status = status;
-    }
+    // STATUS filter
+    if (status) query.status = status;
 
-    // PRICE RANGE
+    // PRICE RANGE filter
     if (minPrice || maxPrice) {
       query.price = {};
-
       if (minPrice) query.price.$gte = Number(minPrice);
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
 
-    // AMENITIES FILTER
+    // AMENITIES filter
     if (amenities) {
       const amenitiesArray = amenities.split(",");
       query.amenities = { $in: amenitiesArray };
@@ -92,7 +91,6 @@ router.get("/", async (req, res) => {
 
     // SORTING
     let sortOption = { createdAt: -1 };
-
     if (sort === "price_low") sortOption = { price: 1 };
     if (sort === "price_high") sortOption = { price: -1 };
     if (sort === "newest") sortOption = { createdAt: -1 };
@@ -100,7 +98,6 @@ router.get("/", async (req, res) => {
     if (sort === "size") sortOption = { size: -1 };
 
     const listings = await Listing.find(query).sort(sortOption);
-
     res.json(listings);
   } catch (err) {
     console.error(err);
