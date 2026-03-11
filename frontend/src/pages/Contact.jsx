@@ -1,6 +1,7 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { useRef } from "react";
+import { t } from "@lingui/macro";
 
 export default function Contact() {
   const form = useRef();
@@ -17,26 +18,27 @@ export default function Contact() {
       )
       .then(
         () => {
-          alert("Message sent successfully!");
+          alert(t`Message sent successfully!`);
           form.current.reset();
         },
         (error) => {
-          alert("Failed to send message");
+          alert(t`Failed to send message`);
           console.error(error);
         },
       );
   };
+
   return (
     <div className="bg-linear-to-b from-white via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-950 dark:to-black min-h-screen transition-colors">
       <div className="max-w-7xl mx-auto px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl font-extrabold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Contact Our Experts
+            {t`Contact Our Experts`}
           </h1>
 
           <p className="text-slate-500 dark:text-slate-400 mt-4 text-lg">
-            We are here to help you find your next big investment.
+            {t`We are here to help you find your next big investment.`}
           </p>
         </div>
 
@@ -51,7 +53,7 @@ export default function Contact() {
 
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white">
-                  Call Us
+                  {t`Call Us`}
                 </h4>
 
                 <p className="text-slate-600 dark:text-slate-400">
@@ -67,7 +69,7 @@ export default function Contact() {
 
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white">
-                  Email Us
+                  {t`Email Us`}
                 </h4>
 
                 <p className="text-slate-600 dark:text-slate-400">
@@ -83,7 +85,7 @@ export default function Contact() {
 
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white">
-                  Office Address
+                  {t`Office Address`}
                 </h4>
 
                 <p className="text-slate-600 dark:text-slate-400">
@@ -103,7 +105,7 @@ export default function Contact() {
               <input
                 name="user_name"
                 type="text"
-                placeholder="Full Name"
+                placeholder={t`Full Name`}
                 className="w-full p-4 bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl outline-none focus:ring-2 ring-blue-400/30 text-slate-900 dark:text-white placeholder:text-slate-400 transition"
                 required
               />
@@ -111,7 +113,7 @@ export default function Contact() {
               <input
                 name="user_email"
                 type="email"
-                placeholder="Email Address"
+                placeholder={t`Email Address`}
                 className="w-full p-4 bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl outline-none focus:ring-2 ring-blue-400/30 text-slate-900 dark:text-white placeholder:text-slate-400 transition"
                 required
               />
@@ -119,14 +121,14 @@ export default function Contact() {
               <input
                 name="subject"
                 type="text"
-                placeholder="Subject"
+                placeholder={t`Subject`}
                 className="md:col-span-2 w-full p-4 bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl outline-none focus:ring-2 ring-blue-400/30 text-slate-900 dark:text-white placeholder:text-slate-400 transition"
                 required
               />
 
               <textarea
                 name="message"
-                placeholder="How can we help you?"
+                placeholder={t`How can we help you?`}
                 className="md:col-span-2 w-full p-4 h-40 bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl outline-none focus:ring-2 ring-blue-400/30 text-slate-900 dark:text-white placeholder:text-slate-400 transition resize-none"
                 required
               ></textarea>
@@ -135,7 +137,7 @@ export default function Contact() {
                 type="submit"
                 className="md:col-span-2 bg-linear-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300"
               >
-                Send Message
+                {t`Send Message`}
               </button>
             </form>
           </div>

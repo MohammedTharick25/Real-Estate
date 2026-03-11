@@ -11,6 +11,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { t } from "@lingui/macro";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("add");
@@ -45,12 +46,12 @@ export default function AdminDashboard() {
       });
       fetchListings();
     } catch (err) {
-      alert("Failed to update status", err.message);
+      alert(t`Failed to update status: ${err.message}`);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Permanent Delete?")) {
+    if (window.confirm(t`Permanent Delete?`)) {
       await axios.delete(`http://localhost:5000/api/listings/${id}`);
       fetchListings();
     }
@@ -68,7 +69,7 @@ export default function AdminDashboard() {
       await axios.post("http://localhost:5000/api/listings", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Property Added!");
+      alert(t`Property Added!`);
       setActiveTab("manage");
       fetchListings();
     } catch (err) {
@@ -82,7 +83,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row transition-colors">
       {/* Mobile Header */}
       <div className="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-brand">AdminPanel</h2>
+        <h2 className="text-xl font-bold text-brand">{t`AdminPanel`}</h2>
         <button onClick={() => setSidebarOpen(!sidebarOpen)}>
           <Menu />
         </button>
@@ -95,10 +96,12 @@ export default function AdminDashboard() {
             initial={{ x: -200 }}
             animate={{ x: 0 }}
             exit={{ x: -200 }}
-            className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white p-6 transition-all ${sidebarOpen ? "block" : "hidden md:block"}`}
+            className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white p-6 transition-all ${
+              sidebarOpen ? "block" : "hidden md:block"
+            }`}
           >
             <div className="flex justify-between items-center mb-10">
-              <h2 className="text-2xl font-bold text-brand">AdminPanel</h2>
+              <h2 className="text-2xl font-bold text-brand">{t`AdminPanel`}</h2>
               <button
                 className="md:hidden"
                 onClick={() => setSidebarOpen(false)}
@@ -119,7 +122,7 @@ export default function AdminDashboard() {
                     : "hover:bg-slate-800 text-slate-400"
                 }`}
               >
-                <Plus size={20} className="mr-3" /> Add Listing
+                <Plus size={20} className="mr-3" /> {t`Add Listing`}
               </button>
 
               <button
@@ -133,7 +136,7 @@ export default function AdminDashboard() {
                     : "hover:bg-slate-800 text-slate-400"
                 }`}
               >
-                <LayoutGrid size={20} className="mr-3" /> Manage All
+                <LayoutGrid size={20} className="mr-3" /> {t`Manage All`}
               </button>
             </nav>
           </motion.div>
@@ -150,7 +153,7 @@ export default function AdminDashboard() {
               className="bg-white dark:bg-slate-900 p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800"
             >
               <h1 className="text-3xl font-bold mb-8 text-slate-800 dark:text-white">
-                New Property
+                {t`New Property`}
               </h1>
 
               <form
@@ -158,9 +161,7 @@ export default function AdminDashboard() {
                 className="grid grid-cols-1 md:grid-cols-2 gap-6"
               >
                 <div className="md:col-span-2 space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">
-                    Title
-                  </label>
+                  <label className="text-xs font-bold text-slate-400 uppercase">{t`Title`}</label>
                   <input
                     type="text"
                     required
@@ -172,9 +173,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">
-                    Price (₹)
-                  </label>
+                  <label className="text-xs font-bold text-slate-400 uppercase">{t`Price (₹)`}</label>
                   <input
                     type="number"
                     required
@@ -186,9 +185,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">
-                    Size (sqft/acre)
-                  </label>
+                  <label className="text-xs font-bold text-slate-400 uppercase">{t`Size (sqft/acre)`}</label>
                   <input
                     type="text"
                     required
@@ -200,9 +197,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="md:col-span-2 space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">
-                    Location
-                  </label>
+                  <label className="text-xs font-bold text-slate-400 uppercase">{t`Location`}</label>
                   <input
                     type="text"
                     required
@@ -214,26 +209,22 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">
-                    Type
-                  </label>
+                  <label className="text-xs font-bold text-slate-400 uppercase">{t`Type`}</label>
                   <select
                     className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:border-brand outline-none text-slate-900 dark:text-white"
                     onChange={(e) =>
                       setFormData({ ...formData, propertyType: e.target.value })
                     }
                   >
-                    <option>Land</option>
-                    <option>House</option>
-                    <option>Apartment</option>
+                    <option>{t`Land`}</option>
+                    <option>{t`House`}</option>
+                    <option>{t`Apartment`}</option>
                   </select>
                 </div>
 
                 <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-blue-50/50 dark:bg-slate-800 p-6 rounded-3xl border border-dashed border-blue-200 dark:border-slate-700">
                   <div>
-                    <label className="block text-sm font-bold mb-2 dark:text-white">
-                      Images
-                    </label>
+                    <label className="block text-sm font-bold mb-2 dark:text-white">{t`Images`}</label>
                     <input
                       type="file"
                       multiple
@@ -243,9 +234,7 @@ export default function AdminDashboard() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2 dark:text-white">
-                      Videos
-                    </label>
+                    <label className="block text-sm font-bold mb-2 dark:text-white">{t`Videos`}</label>
                     <input
                       type="file"
                       multiple
@@ -257,9 +246,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="md:col-span-2 space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">
-                    Description
-                  </label>
+                  <label className="text-xs font-bold text-slate-400 uppercase">{t`Description`}</label>
                   <textarea
                     required
                     className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl h-40 focus:border-brand outline-none text-slate-900 dark:text-white"
@@ -273,15 +260,13 @@ export default function AdminDashboard() {
                   disabled={isUploading}
                   className="md:col-span-2 w-full py-5 bg-blue-900 text-white rounded-2xl font-bold text-lg hover:shadow-2xl transition-all disabled:bg-slate-300 hover:cursor-pointer"
                 >
-                  {isUploading ? "Uploading..." : "Publish Property"}
+                  {isUploading ? t`Uploading...` : t`Publish Property`}
                 </button>
               </form>
             </motion.div>
           ) : (
             <div className="space-y-4">
-              <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-8">
-                Manage Listings
-              </h1>
+              <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-8">{t`Manage Listings`}</h1>
 
               <div className="grid grid-cols-1 gap-4">
                 {listings.map((item) => (
@@ -305,7 +290,7 @@ export default function AdminDashboard() {
                           {item.location}
                         </p>
                         <p className="text-brand font-black mt-1">
-                          ${item.price.toLocaleString()}
+                          ₹{item.price.toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -324,7 +309,7 @@ export default function AdminDashboard() {
                         ) : (
                           <CheckCircle size={16} />
                         )}
-                        {item.status}
+                        {t`${item.status}`}
                       </button>
 
                       <button

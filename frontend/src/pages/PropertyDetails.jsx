@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { t } from "@lingui/macro";
 
 export default function PropertyDetails() {
   const { id } = useParams();
@@ -32,7 +33,8 @@ export default function PropertyDetails() {
   }, [id]);
 
   if (loading) return <LoadingSpinner fullScreen />;
-  if (!property) return <p className="text-center py-20">Property not found</p>;
+  if (!property)
+    return <p className="text-center py-20">{t`Property not found`}</p>;
 
   const mediaList = [
     ...(property.videos?.[0] ? [property.videos[0]] : []),
@@ -61,36 +63,30 @@ export default function PropertyDetails() {
               >
                 <ArrowLeft />
               </button>
-
               <h2 className="font-bold dark:text-white">
-                Media ({mediaList.length})
+                {t`Media`} ({mediaList.length})
               </h2>
-
               <div className="w-10"></div>
             </div>
 
             <div className="max-w-3xl mx-auto p-4 space-y-4">
-              {mediaList.map((media, i) => {
-                if (i === 0 && property.videos?.[0]) {
-                  return (
-                    <video
-                      key={i}
-                      src={media}
-                      controls
-                      className="w-full rounded-2xl shadow-lg"
-                    />
-                  );
-                } else {
-                  return (
-                    <img
-                      key={i}
-                      src={media}
-                      className="w-full rounded-2xl shadow-lg"
-                      alt={`Media ${i}`}
-                    />
-                  );
-                }
-              })}
+              {mediaList.map((media, i) =>
+                i === 0 && property.videos?.[0] ? (
+                  <video
+                    key={i}
+                    src={media}
+                    controls
+                    className="w-full rounded-2xl shadow-lg"
+                  />
+                ) : (
+                  <img
+                    key={i}
+                    src={media}
+                    className="w-full rounded-2xl shadow-lg"
+                    alt={`${t`Media`} ${i}`}
+                  />
+                ),
+              )}
             </div>
           </motion.div>
         )}
@@ -103,14 +99,13 @@ export default function PropertyDetails() {
           className="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-blue-600"
         >
           <ArrowLeft size={20} />
-          <span className="hidden sm:inline">Back</span>
+          <span className="hidden sm:inline">{t`Back`}</span>
         </button>
 
         <div className="flex gap-2">
           <button className="p-2 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-full">
             <Share2 size={20} />
           </button>
-
           <button className="p-2 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-full">
             <Heart size={20} />
           </button>
@@ -144,7 +139,7 @@ export default function PropertyDetails() {
             onClick={() => setShowAllPhotos(true)}
             className="absolute bottom-4 left-4 bg-white/90 dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg"
           >
-            <Grid size={14} /> View All
+            <Grid size={14} /> {t`View All`}
           </button>
         </div>
 
@@ -153,9 +148,7 @@ export default function PropertyDetails() {
           {mediaList.slice(0, 5).map((media, i) => (
             <div
               key={i}
-              className={`overflow-hidden group cursor-pointer ${
-                i === 0 ? "col-span-2 row-span-2" : ""
-              }`}
+              className={`overflow-hidden group cursor-pointer ${i === 0 ? "col-span-2 row-span-2" : ""}`}
               onClick={() => setShowAllPhotos(true)}
             >
               {i === 0 && property.videos?.[0] ? (
@@ -168,14 +161,13 @@ export default function PropertyDetails() {
                 <img
                   src={media}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  alt={`Media ${i}`}
+                  alt={`${t`Media`} ${i}`}
                 />
               )}
-
               {i === 4 && mediaList.length > 5 && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <span className="text-white font-bold text-lg">
-                    +{mediaList.length - 5} More
+                    +{mediaList.length - 5} {t`More`}
                   </span>
                 </div>
               )}
@@ -184,7 +176,7 @@ export default function PropertyDetails() {
         </div>
       </div>
 
-      {/* DETAILS SECTION (unchanged) */}
+      {/* DETAILS SECTION */}
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* LEFT */}
         <div className="lg:col-span-2">
@@ -219,69 +211,64 @@ export default function PropertyDetails() {
           <div className="flex gap-4 py-8 border-y border-blue-100 dark:border-slate-800 mb-10 overflow-x-auto">
             <Feature
               icon={<Ruler />}
-              label="Total Area"
+              label={t`Total Area`}
               value={property.size}
             />
             <Feature
               icon={<Building />}
-              label="Structure"
+              label={t`Structure`}
               value={property.propertyType}
             />
             <Feature
               icon={<ShieldCheck className="text-green-500" />}
-              label="Verification"
-              value="Approved"
+              label={t`Verification`}
+              value={t`Approved`}
             />
           </div>
 
           {/* DESCRIPTION */}
           <div className="mb-12">
             <h3 className="text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              The Property
+              {t`The Property`}
             </h3>
-
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg whitespace-pre-line">
               {property.description}
             </p>
           </div>
         </div>
 
-        {/* SIDEBAR (unchanged) */}
+        {/* SIDEBAR */}
         <div className="lg:col-span-1">
           <div className="lg:sticky lg:top-24">
             <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-2xl dark:shadow-black/30">
-              <p className="text-xs font-bold text-slate-400 uppercase mb-2">
-                Asking Price
-              </p>
+              <p className="text-xs font-bold text-slate-400 uppercase mb-2">{t`Asking Price`}</p>
 
               <h2 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-8">
                 ₹{property.price.toLocaleString()}
               </h2>
 
               <div className="space-y-4 mb-10">
-                <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-2xl font-black text-lg hover:shadow-2xl hover:shadow-blue-500/40 transition">
-                  Contact Agent
-                </button>
-
-                <button className="w-full border border-blue-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 py-5 rounded-2xl font-black text-lg hover:bg-blue-50 dark:hover:bg-slate-800 transition">
-                  Download Brochure
+                <button
+                  onClick={() => navigate("/contact")}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-2xl font-black text-lg hover:shadow-2xl hover:shadow-blue-500/40 transition"
+                >
+                  {t`Contact Agent`}
                 </button>
               </div>
 
+              {/* Schedule a visit */}
               <div className="pt-8 border-t border-blue-100 dark:border-slate-800">
-                <h3 className="text-xl font-black mb-6 dark:text-white">
-                  Schedule a Visit
-                </h3>
+                <h3 className="text-xl font-black mb-6 dark:text-white">{t`Schedule a Visit`}</h3>
 
                 <form className="space-y-4">
                   <input
                     type="text"
-                    placeholder="Full Name"
+                    placeholder={t`Full Name`}
                     className="w-full p-4 bg-blue-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl outline-none"
                   />
 
                   <textarea
-                    placeholder="Your Message..."
+                    placeholder={t`Your Message...`}
                     className="w-full p-4 bg-blue-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl outline-none h-24"
                   />
 
@@ -289,7 +276,7 @@ export default function PropertyDetails() {
                     type="button"
                     className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 rounded-xl font-bold hover:opacity-90 transition"
                   >
-                    Request Visit
+                    {t`Request Visit`}
                   </button>
                 </form>
               </div>
@@ -312,7 +299,6 @@ function Feature({ icon, label, value }) {
         <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">
           {label}
         </p>
-
         <p className="font-black text-slate-800 dark:text-slate-200 text-sm">
           {value}
         </p>

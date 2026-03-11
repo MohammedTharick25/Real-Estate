@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { t } from "@lingui/macro";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -11,31 +12,25 @@ export default function Signup() {
   });
 
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (loading) return;
 
     try {
       setLoading(true);
-
       await axios.post("http://localhost:5000/api/auth/signup", formData);
 
-      alert("Account created! Please login.");
+      alert(t`Account created! Please login.`);
       navigate("/login");
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || "Registration failed");
+      alert(err.response?.data?.error || t`Registration failed`);
     } finally {
       setLoading(false);
     }
@@ -51,11 +46,11 @@ export default function Signup() {
         <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 transition-colors">
           {/* Heading */}
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Create Account
+            {t`Create Account`}
           </h2>
 
           <p className="text-slate-500 dark:text-slate-400 mb-8">
-            Join our community to find your perfect home.
+            {t`Join our community to find your perfect home.`}
           </p>
 
           {/* Form */}
@@ -63,7 +58,7 @@ export default function Signup() {
             <input
               type="text"
               name="name"
-              placeholder="Full Name"
+              placeholder={t`Full Name`}
               required
               value={formData.name}
               onChange={handleChange}
@@ -73,7 +68,7 @@ export default function Signup() {
             <input
               type="email"
               name="email"
-              placeholder="Email Address"
+              placeholder={t`Email Address`}
               required
               value={formData.email}
               onChange={handleChange}
@@ -83,7 +78,7 @@ export default function Signup() {
             <input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder={t`Password`}
               required
               value={formData.password}
               onChange={handleChange}
@@ -94,15 +89,15 @@ export default function Signup() {
               disabled={loading}
               className="w-full bg-blue-950 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all active:scale-95 disabled:opacity-60"
             >
-              {loading ? "Creating Account..." : "Sign Up"}
+              {loading ? t`Creating Account...` : t`Sign Up`}
             </button>
           </form>
 
           {/* Footer */}
           <p className="mt-6 text-center text-slate-600 dark:text-slate-400">
-            Already have an account?{" "}
+            {t`Already have an account?`}{" "}
             <Link to="/login" className="text-brand font-bold">
-              Login
+              {t`Login`}
             </Link>
           </p>
         </div>

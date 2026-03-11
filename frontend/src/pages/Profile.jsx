@@ -14,8 +14,11 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { t } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
 
 export default function Profile() {
+  const { i18n } = useLingui();
   const { user, logout, login } = useAuth();
   const navigate = useNavigate();
 
@@ -26,6 +29,7 @@ export default function Profile() {
   const [formData, setFormData] = useState({
     name: user?.user?.name || "",
     email: user?.user?.email || "",
+    language: user?.user?.language || "en",
   });
 
   const [previewImage, setPreviewImage] = useState(null);
@@ -42,62 +46,64 @@ export default function Profile() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setSelectedFile(file);
     setPreviewImage(URL.createObjectURL(file));
   };
 
+  const handleLanguageChange = (e) => {
+    const lang = e.target.value;
+    setFormData((prev) => ({ ...prev, language: lang }));
+
+    // Lingui activation
+    i18n.activate(lang);
+    localStorage.setItem("lang", lang);
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
-
     const userId = user?.user?.id || user?.user?._id;
 
     const data = new FormData();
     data.append("name", formData.name);
     data.append("email", formData.email);
+    data.append("language", formData.language);
     data.append("id", userId);
-
     if (selectedFile) data.append("image", selectedFile);
 
     setLoading(true);
-
     try {
       const res = await axios.put(
         "http://localhost:5000/api/users/update",
         data,
       );
-
       login(res.data);
       setIsEditing(false);
       setPreviewImage(null);
     } catch (err) {
       console.error(err);
-      alert("Profile update failed");
+      alert(t`Profile update failed`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-slate-950">
+    <div className="bg-white dark:bg-slate-950 min-h-screen">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl mx-auto px-4 py-16 bg-white dark:bg-slate-900"
+        className="max-w-4xl mx-auto px-4 py-16"
       >
         <div className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl dark:shadow-black/40 overflow-hidden border border-slate-100 dark:border-slate-800">
-          {/* Header */}
           <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700" />
-
           <div className="px-8 pb-12 relative">
-            {/* Avatar */}
-            <div className="relative -mt-16 mb-6">
+            <div className="relative -mt-16 mb-6 flex justify-center">
               <div className="relative group w-fit">
                 <img
                   src={currentAvatar}
                   className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-900 shadow-xl object-cover"
+                  alt="Avatar"
                 />
-
                 {isEditing && (
                   <button
                     onClick={() => fileInputRef.current.click()}
@@ -106,7 +112,6 @@ export default function Profile() {
                     <Camera />
                   </button>
                 )}
-
                 <input
                   type="file"
                   hidden
@@ -125,52 +130,49 @@ export default function Profile() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  {/* User Info */}
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                       <h1 className="text-4xl font-black text-slate-900 dark:text-white">
                         {user.user.name}
                       </h1>
-
                       <p className="text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1 mt-1 lowercase">
                         <Mail size={16} /> {user.user.email}
                       </p>
                     </div>
-
                     <button
                       onClick={() => setIsEditing(true)}
                       className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition"
                     >
-                      <Edit3 size={16} />
-                      Edit
+                      <Edit3 size={16} /> {t`Edit Profile`}
                     </button>
                   </div>
 
-                  {/* Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
                     <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
                       <h3 className="font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <UserIcon size={18} /> Information
+                        <UserIcon size={18} /> {t`Edit Profile`}
                       </h3>
-
                       <div className="space-y-3 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-slate-400 font-bold">
-                            Full Name
-                          </span>
-
+                          <span className="text-slate-400 font-bold">{t`Full Name`}</span>
                           <span className="font-black text-slate-900 dark:text-white">
                             {user.user.name}
                           </span>
                         </div>
-
                         <div className="flex justify-between">
-                          <span className="text-slate-400 font-bold">
-                            Email
-                          </span>
-
+                          <span className="text-slate-400 font-bold">{t`Email`}</span>
                           <span className="font-black text-slate-900 dark:text-white">
                             {user.user.email}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400 font-bold">{t`Preferred Language`}</span>
+                          <span className="font-black text-slate-900 dark:text-white">
+                            {formData.language === "hi"
+                              ? t`Hindi`
+                              : formData.language === "ta"
+                                ? t`Tamil`
+                                : t`English`}
                           </span>
                         </div>
                       </div>
@@ -178,35 +180,31 @@ export default function Profile() {
 
                     <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
                       <h3 className="font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <Shield size={18} /> Permissions
+                        <Shield size={18} /> {t`Permissions`}
                       </h3>
-
                       <p className="text-slate-500 dark:text-slate-400 text-sm">
-                        You currently have{" "}
+                        {t`Current Role`}{" "}
                         <span className="font-black text-slate-900 dark:text-white">
                           {user.user.role}
-                        </span>{" "}
-                        access level.
+                        </span>
                       </p>
                     </div>
                   </div>
 
-                  {/* Buttons */}
                   <div className="mt-12 flex flex-col sm:flex-row gap-4">
                     {user.user.role === "admin" && (
                       <button
                         onClick={() => navigate("/admin")}
                         className="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
                       >
-                        Manage Dashboard <ArrowRight size={20} />
+                        {t`Manage Dashboard`} <ArrowRight size={20} />
                       </button>
                     )}
-
                     <button
                       onClick={logout}
                       className="flex-1 border-2 border-red-200 text-red-500 py-4 rounded-2xl font-black text-lg hover:bg-red-50 transition"
                     >
-                      Sign Out
+                      {t`Sign Out`}
                     </button>
                   </div>
                 </motion.div>
@@ -220,15 +218,11 @@ export default function Profile() {
                   className="space-y-6"
                 >
                   <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">
-                      Edit Profile
-                    </h2>
-
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">{t`Edit Profile`}</h2>
                     <button type="button" onClick={() => setIsEditing(false)}>
                       <X />
                     </button>
                   </div>
-
                   <input
                     type="text"
                     value={formData.name}
@@ -236,8 +230,8 @@ export default function Profile() {
                       setFormData({ ...formData, name: e.target.value })
                     }
                     className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200"
+                    placeholder={t`Full Name`}
                   />
-
                   <input
                     type="email"
                     value={formData.email}
@@ -245,15 +239,27 @@ export default function Profile() {
                       setFormData({ ...formData, email: e.target.value })
                     }
                     className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200"
+                    placeholder={t`Email`}
                   />
-
+                  <div>
+                    <label className="block mb-2 font-bold">{t`Preferred Language`}</label>
+                    <select
+                      value={formData.language}
+                      onChange={handleLanguageChange}
+                      className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200"
+                    >
+                      <option value="en">{t`English`}</option>
+                      <option value="hi">{t`Hindi`}</option>
+                      <option value="ta">{t`Tamil`}</option>
+                    </select>
+                  </div>
                   <button
                     type="submit"
                     disabled={loading}
                     className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
                     {loading ? <Loader2 className="animate-spin" /> : <Check />}
-                    {loading ? "Saving..." : "Save Changes"}
+                    {loading ? t`Saving...` : t`Save Changes`}
                   </button>
                 </motion.form>
               )}

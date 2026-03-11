@@ -1,27 +1,39 @@
 import { motion } from "framer-motion";
-
-const reviews = [
-  {
-    id: 1,
-    name: "John Doe",
-    text: "Found my dream home in just two weeks! Excellent service.",
-    role: "Homeowner",
-  },
-  {
-    id: 2,
-    name: "Sarah Smith",
-    text: "The land acquisition process was transparent and fast.",
-    role: "Investor",
-  },
-  {
-    id: 3,
-    name: "Mike Ross",
-    text: "The best real estate platform I've ever used. 10/10.",
-    role: "CEO, Tech Corp",
-  },
-];
+import { t } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
+import { useMemo } from "react"; // Added useMemo for efficiency
 
 export default function Testimonials() {
+  // 1. Subscribe to language changes
+  useLingui();
+
+  // 2. Define the reviews array INSIDE the component.
+  // We use useMemo so the array isn't recreated on every tiny re-render,
+  // but it will update if the language changes.
+  const reviews = useMemo(
+    () => [
+      {
+        id: 1,
+        name: t`John Doe`,
+        text: t`Finding the perfect land was so easy with Estatera. Highly recommended!`,
+        role: t`Investor`,
+      },
+      {
+        id: 2,
+        name: t`Sarah Jenkins`,
+        text: t`The team helped me find my dream home in a prime location. Excellent service!`,
+        role: t`Homeowner`,
+      },
+      {
+        id: 3,
+        name: t`Michael Ross`,
+        text: t`Verified properties and professional guidance. My future is secure.`,
+        role: t`Repeat Client`,
+      },
+    ],
+    [],
+  ); // Empty dependency array is fine because useLingui handles the refresh
+
   return (
     <section
       aria-labelledby="testimonials-heading"
@@ -33,7 +45,7 @@ export default function Testimonials() {
           id="testimonials-heading"
           className="text-3xl md:text-4xl font-black text-center mb-12 text-slate-900 dark:text-white"
         >
-          What Our Clients Say
+          {t`10k+ Happy Clients`}
         </h2>
 
         {/* Testimonials Grid */}
@@ -58,7 +70,7 @@ export default function Testimonials() {
               </h4>
 
               {/* Role */}
-              <span className="text-sm text-brand font-medium">
+              <span className="text-sm text-blue-600 font-medium">
                 {review.role}
               </span>
             </motion.div>
