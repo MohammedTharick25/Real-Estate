@@ -5,32 +5,19 @@ const { storage } = require("../config/cloudinary");
 const multer = require("multer");
 const upload = multer({ storage });
 
+// 1. UPDATE PROFILE (Existing)
 router.put("/update", upload.single("image"), async (req, res) => {
   try {
     const { name, email, id } = req.body;
-
-    console.log("Updating User ID:", id); // DEBUG 1
-    console.log("New Name:", name); // DEBUG 2
-
-    if (!id || id === "undefined") {
-      return res.status(400).json({ error: "User ID is missing or invalid" });
-    }
+    if (!id || id === "undefined")
+      return res.status(400).json({ error: "User ID missing" });
 
     let updateData = { name, email };
-
-    if (req.file) {
-      console.log("New File Uploaded:", req.file.path); // DEBUG 3
-      updateData.image = req.file.path;
-    }
+    if (req.file) updateData.image = req.file.path;
 
     const updatedUser = await User.findByIdAndUpdate(id, updateData, {
       new: true,
     });
-
-    if (!updatedUser) {
-      return res.status(404).json({ error: "User not found in database" });
-    }
-
     res.status(200).json({
       user: {
         id: updatedUser._id,
@@ -38,11 +25,45 @@ router.put("/update", upload.single("image"), async (req, res) => {
         email: updatedUser.email,
         role: updatedUser.role,
         image: updatedUser.image,
+        favorites: updatedUser.favorites, // Include favorites in response
       },
-      message: "Profile updated successfully!",
     });
   } catch (err) {
-    console.error("CRASH ERROR:", err); // THIS WILL TELL YOU WHY IT IS A 500 ERROR
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 2. TOGGLE FAVORITE (NEW - Fixes the 404 POST error)
+router.post("/favorites/toggle", async (req, res) => {
+  try {
+    const { userId, propertyId } = req.body;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const isFavorite = user.favorites.includes(propertyId);
+
+    if (isFavorite) {
+      user.favorites = user.favorites.filter(
+        (id) => id.toString() !== propertyId,
+      );
+    } else {
+      user.favorites.push(propertyId);
+    }
+
+    await user.save();
+    res.status(200).json({ favorites: user.favorites });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 3. GET USER FAVORITES (NEW - Fixes the 404 GET error)
+router.get("/favorites/:userId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).populate("favorites");
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json(user.favorites);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

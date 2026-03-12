@@ -13,21 +13,27 @@ import {
   Loader2,
   Star,
   MessageSquare,
+  Heart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { t } from "@lingui/macro";
 import { useLingui } from "@lingui/react";
+import PropertyCard from "../components/PropertyCard";
 
 export default function Profile() {
   const { i18n } = useLingui();
   const { user, logout, login } = useAuth();
   const navigate = useNavigate();
 
+  const [activeProfileTab, setActiveProfileTab] = useState("visits");
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const [myVisits, setMyVisits] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [feedbackData, setFeedbackData] = useState({ rating: 5, comment: "" });
+
   const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
@@ -39,9 +45,13 @@ export default function Profile() {
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
+  // Fetch Data on Load
   useEffect(() => {
-    if (user?.user?.id) fetchMyVisits();
-  }, [user]);
+    if (user?.user?.id) {
+      fetchMyVisits();
+      fetchFavorites();
+    }
+  }, [user?.user?.id, user?.user?.favorites]); // Refetch if ID changes or wishlist updates
 
   const fetchMyVisits = async () => {
     try {
@@ -49,6 +59,17 @@ export default function Profile() {
         `http://localhost:5000/api/visits/user/${user.user.id}`,
       );
       setMyVisits(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchFavorites = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/users/favorites/${user.user.id}`,
+      );
+      setFavorites(res.data);
     } catch (err) {
       console.error(err);
     }
@@ -66,14 +87,6 @@ export default function Profile() {
       alert(t`Failed to send message`);
     }
   };
-
-  if (!user) {
-    navigate("/login");
-    return null;
-  }
-
-  const defaultImg = `https://ui-avatars.com/api/?name=${user.user.name}&background=2563eb&color=fff&size=200`;
-  const currentAvatar = previewImage || user?.user?.image || defaultImg;
 
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
@@ -123,6 +136,16 @@ export default function Profile() {
     }
   };
 
+  if (!user) {
+    navigate("/login");
+    return null;
+  }
+
+  const currentAvatar =
+    previewImage ||
+    user?.user?.image ||
+    `https://ui-avatars.com/api/?name=${user.user.name}&background=2563eb&color=fff&size=200`;
+
   return (
     <div className="bg-white dark:bg-slate-950 min-h-screen">
       <motion.div
@@ -130,8 +153,9 @@ export default function Profile() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto px-4 py-16"
       >
-        <div className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl dark:shadow-black/40 overflow-hidden border border-slate-100 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800">
           <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700" />
+
           <div className="px-8 pb-12 relative">
             <div className="relative -mt-16 mb-6 flex justify-center">
               <div className="relative group w-fit">
@@ -186,6 +210,7 @@ export default function Profile() {
                     </button>
                   </div>
 
+                  {/* Info Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
                     <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
                       <h3 className="font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2">
@@ -216,101 +241,146 @@ export default function Profile() {
                         </div>
                       </div>
                     </div>
-
                     <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
                       <h3 className="font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                         <Shield size={18} /> {t`Permissions`}
                       </h3>
                       <p className="text-slate-500 dark:text-slate-400 text-sm">
                         {t`Current Role`}{" "}
-                        <span className="font-black text-slate-900 dark:text-white">
+                        <span className="font-black text-slate-900 dark:text-white uppercase">
                           {user.user.role}
                         </span>
                       </p>
                     </div>
                   </div>
 
-                  {/* Visit History Section */}
+                  {/* Tabs Section */}
                   <div className="mt-12">
-                    <h3 className="text-2xl font-black mb-6 dark:text-white flex items-center gap-2">
-                      <MessageSquare /> {t`Schedule a Visit`}
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4">
-                      {myVisits.map((v) => (
-                        <div
-                          key={v._id}
-                          className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700"
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <p className="font-bold dark:text-white">
-                                {v.propertyId?.title}
-                              </p>
-                              <p className="text-xs text-slate-400">
-                                {v.propertyId?.location}
-                              </p>
-                            </div>
-                            <span
-                              className={`text-[10px] font-black uppercase px-3 py-1 rounded-lg ${getStatusStyles(v.status)}`}
-                            >
-                              {t`${v.status}`}
-                            </span>
-                          </div>
-
-                          {v.status === "visited" && !v.feedback?.rating && (
-                            <div className="mt-4 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-dashed border-blue-200 dark:border-slate-700">
-                              <p className="text-sm font-bold mb-3 dark:text-white">{t`Rate your experience`}</p>
-                              <div className="flex gap-2 mb-4">
-                                {[1, 2, 3, 4, 5].map((num) => (
-                                  <Star
-                                    key={num}
-                                    size={20}
-                                    className="cursor-pointer"
-                                    fill={
-                                      feedbackData.rating >= num
-                                        ? "gold"
-                                        : "none"
-                                    }
-                                    color={
-                                      feedbackData.rating >= num
-                                        ? "gold"
-                                        : "gray"
-                                    }
-                                    onClick={() =>
-                                      setFeedbackData({
-                                        ...feedbackData,
-                                        rating: num,
-                                      })
-                                    }
-                                  />
-                                ))}
-                              </div>
-                              <textarea
-                                placeholder={t`Your Message...`}
-                                className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl mb-4 text-sm outline-none dark:text-white"
-                                onChange={(e) =>
-                                  setFeedbackData({
-                                    ...feedbackData,
-                                    comment: e.target.value,
-                                  })
-                                }
-                              />
-                              <button
-                                onClick={() => submitFeedback(v._id)}
-                                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold text-sm"
-                              >{t`Save Changes`}</button>
-                            </div>
-                          )}
-                          {v.feedback?.rating && (
-                            <div className="mt-2 text-sm text-slate-500 italic">
-                              "{v.feedback.comment}" - {v.feedback.rating}/5 ⭐
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                    <div className="flex border-b dark:border-slate-800 mb-8 overflow-x-auto">
+                      <button
+                        onClick={() => setActiveProfileTab("visits")}
+                        className={`px-6 py-4 font-bold transition-all border-b-2 flex items-center gap-2 ${activeProfileTab === "visits" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400"}`}
+                      >
+                        <MessageSquare size={18} /> {t`Schedule a Visit`}
+                      </button>
+                      <button
+                        onClick={() => setActiveProfileTab("favorites")}
+                        className={`px-6 py-4 font-bold transition-all border-b-2 flex items-center gap-2 ${activeProfileTab === "favorites" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-400"}`}
+                      >
+                        <Heart size={18} /> {t`Wishlist`}
+                      </button>
                     </div>
+
+                    {/* Tab Content */}
+                    <AnimatePresence mode="wait">
+                      {activeProfileTab === "visits" ? (
+                        <motion.div
+                          key="visits-list"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 10 }}
+                          className="grid grid-cols-1 gap-4"
+                        >
+                          {myVisits.length > 0 ? (
+                            myVisits.map((v) => (
+                              <div
+                                key={v._id}
+                                className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <p className="font-bold dark:text-white">
+                                      {v.propertyId?.title}
+                                    </p>
+                                    <p className="text-xs text-slate-400">
+                                      {v.propertyId?.location}
+                                    </p>
+                                  </div>
+                                  <span
+                                    className={`text-[10px] font-black uppercase px-3 py-1 rounded-lg ${getStatusStyles(v.status)}`}
+                                  >{t`${v.status}`}</span>
+                                </div>
+                                {v.status === "visited" &&
+                                  !v.feedback?.rating && (
+                                    <div className="mt-4 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-dashed border-blue-200 dark:border-slate-700">
+                                      <p className="text-sm font-bold mb-3 dark:text-white">{t`Rate your experience`}</p>
+                                      <div className="flex gap-2 mb-4">
+                                        {[1, 2, 3, 4, 5].map((num) => (
+                                          <Star
+                                            key={num}
+                                            size={20}
+                                            className="cursor-pointer"
+                                            fill={
+                                              feedbackData.rating >= num
+                                                ? "gold"
+                                                : "none"
+                                            }
+                                            color={
+                                              feedbackData.rating >= num
+                                                ? "gold"
+                                                : "gray"
+                                            }
+                                            onClick={() =>
+                                              setFeedbackData({
+                                                ...feedbackData,
+                                                rating: num,
+                                              })
+                                            }
+                                          />
+                                        ))}
+                                      </div>
+                                      <textarea
+                                        placeholder={t`Your Message...`}
+                                        className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl mb-4 text-sm outline-none dark:text-white"
+                                        onChange={(e) =>
+                                          setFeedbackData({
+                                            ...feedbackData,
+                                            comment: e.target.value,
+                                          })
+                                        }
+                                      />
+                                      <button
+                                        onClick={() => submitFeedback(v._id)}
+                                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold text-sm"
+                                      >{t`Save Changes`}</button>
+                                    </div>
+                                  )}
+                                {v.feedback?.rating && (
+                                  <div className="mt-2 text-sm text-slate-500 italic">
+                                    "{v.feedback.comment}" - {v.feedback.rating}
+                                    /5 ⭐
+                                  </div>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-center text-slate-500 py-10">{t`No properties found.`}</p>
+                          )}
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="favorites-grid"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+                        >
+                          {favorites.length > 0 ? (
+                            favorites.map((property) => (
+                              <PropertyCard
+                                key={property._id}
+                                property={property}
+                              />
+                            ))
+                          ) : (
+                            <p className="text-center text-slate-500 py-10 col-span-2">{t`No properties found.`}</p>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
 
+                  {/* Actions */}
                   <div className="mt-12 flex flex-col sm:flex-row gap-4">
                     {user.user.role === "admin" && (
                       <button
