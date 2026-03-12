@@ -11,11 +11,15 @@ import {
   ShieldCheck,
   Grid,
 } from "lucide-react";
+import emailjs from "@emailjs/browser";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { t } from "@lingui/macro";
+import { useRef } from "react";
 
 export default function PropertyDetails() {
+  const form = useRef();
+
   const { id } = useParams();
   const navigate = useNavigate();
   const [property, setProperty] = useState(null);
@@ -40,6 +44,28 @@ export default function PropertyDetails() {
     ...(property.videos?.[0] ? [property.videos[0]] : []),
     ...(property.images || []),
   ];
+
+  const sendEmail = (e) => {
+    e.preventDefault();
+
+    emailjs
+      .sendForm(
+        import.meta.env.VITE_EMAIL_SERVICE_ID,
+        import.meta.env.VITE_EMAIL_TEMPLATE_ID,
+        form.current,
+        import.meta.env.VITE_EMAIL_PUBLIC_KEY,
+      )
+      .then(
+        () => {
+          alert(t`Message sent successfully!`);
+          form.current.reset();
+        },
+        (error) => {
+          alert(t`Failed to send message`);
+          console.error(error);
+        },
+      );
+  };
 
   return (
     <motion.div
@@ -260,7 +286,7 @@ export default function PropertyDetails() {
               <div className="pt-8 border-t border-blue-100 dark:border-slate-800">
                 <h3 className="text-xl font-black mb-6 dark:text-white">{t`Schedule a Visit`}</h3>
 
-                <form className="space-y-4">
+                <form ref={form} onSubmit={sendEmail} className="space-y-4">
                   <input
                     type="text"
                     placeholder={t`Full Name`}

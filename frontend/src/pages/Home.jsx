@@ -164,7 +164,7 @@ export default function Home() {
           ].map((badge, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 font-bold text-slate-700 dark:text-slate-300"
+              className="flex items-center gap-3 font-bold text-slate-700 dark:text-slate-300 "
             >
               <span className="p-3 bg-blue-50 dark:bg-slate-800 rounded-full">
                 {badge.icon}
