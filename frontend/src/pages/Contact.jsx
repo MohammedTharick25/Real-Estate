@@ -89,7 +89,7 @@ export default function Contact() {
                 </h4>
 
                 <p className="text-slate-600 dark:text-slate-400">
-                  123 Luxury Way, Beverly Hills, CA
+                  Pudupattinam, Kalpakkam, Tamil Nadu, India
                 </p>
               </div>
             </div>

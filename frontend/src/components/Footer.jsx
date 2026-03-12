@@ -62,7 +62,7 @@ export default function Footer() {
           <h4 className="text-white font-bold mb-4">{t`Contact Our Experts`}</h4>
 
           <div className="space-y-2 text-sm">
-            <p>{t`Office Address`}: 123 Real Estate St, Chennai</p>
+            <p>{t`Office Address`}: Pudupattinam, Kalpakkam</p>
             <p>{t`Email Us`}: estatera@gmail.com</p>
             <p>{t`Call Us`}: +91 97916 74849</p>
           </div>
