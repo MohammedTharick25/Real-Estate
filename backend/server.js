@@ -17,6 +17,8 @@ app.use(express.json());
 app.use("/api/listings", listingRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+const visitRoutes = require("./routes/visitRoutes");
+app.use("/api/visits", visitRoutes);
 
 app.post("/api/inquiry", async (req, res) => {
   try {
