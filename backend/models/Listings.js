@@ -15,6 +15,8 @@ const listingSchema = new mongoose.Schema({
   images: [{ type: String }], // Cloudinary URLs
   videos: [{ type: String }],
   amenities: [String],
+  latitude: { type: Number, required: true, default: 13.0827 }, // Default to Chennai
+  longitude: { type: Number, required: true, default: 80.2707 },
   createdAt: { type: Date, default: Date.now },
 });
 

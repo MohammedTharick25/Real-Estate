@@ -27,6 +27,8 @@ router.post(
         price: Number(req.body.price),
         images: imageUrls,
         videos: videoUrls,
+        latitude: Number(req.body.latitude), // Add this
+        longitude: Number(req.body.longitude),
       });
 
       await newListing.save();

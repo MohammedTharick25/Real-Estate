@@ -10,9 +10,13 @@ import {
   LayoutGrid,
   Calendar,
   Star,
+  Search,
+  MapPin,
+  RefreshCw,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { t } from "@lingui/macro";
+import LocationPicker from "../components/LocationPicker";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("add");
@@ -28,6 +32,8 @@ export default function AdminDashboard() {
     size: "",
     propertyType: "Land",
     description: "",
+    latitude: 13.0827, // Default Chennai
+    longitude: 80.2707,
   });
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -47,33 +53,45 @@ export default function AdminDashboard() {
     setVisits(res.data);
   };
 
-  const updateVisitStatus = async (id, status) => {
+  const API_TOKEN = import.meta.env.VITE_LOCATIONIQ_ACCESS_TOKEN;
+
+  // --- 1. GEOCODING: Address -> Coords ---
+  const handleSearchAddress = async () => {
+    if (!formData.location) return alert(t`Please type an address first`);
     try {
-      await axios.patch(`http://localhost:5000/api/visits/${id}/status`, {
-        status,
-      });
-      fetchVisits();
+      const res = await axios.get(
+        `https://us1.locationiq.com/v1/search.php?key=${API_TOKEN}&q=${encodeURIComponent(formData.location)}&format=json`,
+      );
+
+      if (res.data && res.data.length > 0) {
+        const { lat, lon, display_name } = res.data[0];
+        setFormData((prev) => ({
+          ...prev,
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lon),
+          location: display_name,
+        }));
+        alert(t`Location found and pinned!`);
+      } else {
+        alert(t`Address not found.`);
+      }
     } catch (err) {
-      alert(t`Failed to update status: ${err.message}`);
+      console.error(err);
     }
   };
 
-  const toggleStatus = async (id, currentStatus) => {
-    const newStatus = currentStatus === "Available" ? "Sold" : "Available";
+  // --- 2. REVERSE GEOCODING: Coords -> Address ---
+  const handleManualCoords = async () => {
     try {
-      await axios.patch(`http://localhost:5000/api/listings/${id}/status`, {
-        status: newStatus,
-      });
-      fetchListings();
+      const res = await axios.get(
+        `https://us1.locationiq.com/v1/reverse.php?key=${API_TOKEN}&lat=${formData.latitude}&lon=${formData.longitude}&format=json`,
+      );
+      if (res.data) {
+        setFormData((prev) => ({ ...prev, location: res.data.display_name }));
+        alert(t`Address updated from coordinates!`);
+      }
     } catch (err) {
-      alert(t`Failed to update status: ${err.message}`);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm(t`Permanent Delete?`)) {
-      await axios.delete(`http://localhost:5000/api/listings/${id}`);
-      fetchListings();
+      alert(t`Invalid coordinates or API error.`);
     }
   };
 
@@ -99,7 +117,32 @@ export default function AdminDashboard() {
     }
   };
 
-  // Helper for Status Colors (Matches Profile.jsx logic)
+  const updateVisitStatus = async (id, status) => {
+    try {
+      await axios.patch(`http://localhost:5000/api/visits/${id}/status`, {
+        status,
+      });
+      fetchVisits();
+    } catch (err) {
+      alert(t`Failed to update status`);
+    }
+  };
+
+  const toggleStatus = async (id, currentStatus) => {
+    const newStatus = currentStatus === "Available" ? "Sold" : "Available";
+    await axios.patch(`http://localhost:5000/api/listings/${id}/status`, {
+      status: newStatus,
+    });
+    fetchListings();
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm(t`Permanent Delete?`)) {
+      await axios.delete(`http://localhost:5000/api/listings/${id}`);
+      fetchListings();
+    }
+  };
+
   const getStatusStyles = (status) => {
     switch (status) {
       case "pending":
@@ -176,7 +219,6 @@ export default function AdminDashboard() {
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
       <div className="flex-1 p-4 md:p-10 lg:p-16 overflow-y-auto">
         <div className="max-w-5xl mx-auto">
           {activeTab === "add" && (
@@ -201,6 +243,7 @@ export default function AdminDashboard() {
                     }
                   />
                 </div>
+
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">{t`Price (₹)`}</label>
                   <input
@@ -212,6 +255,7 @@ export default function AdminDashboard() {
                     }
                   />
                 </div>
+
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">{t`Size (sqft/acre)`}</label>
                   <input
@@ -223,18 +267,106 @@ export default function AdminDashboard() {
                     }
                   />
                 </div>
-                <div className="md:col-span-2 space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">{t`Location`}</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full p-4 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-2xl outline-none text-slate-900 dark:text-white"
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
-                    }
-                  />
+
+                {/* --- LOCATION SETTINGS SECTION --- */}
+                <div className="md:col-span-2 space-y-6 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-[2rem] border border-blue-100 dark:border-slate-700">
+                  <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <MapPin size={20} className="text-blue-600" /> {t`Location`}
+                  </h3>
+
+                  {/* Search by Name */}
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase">{t`Search by Address`}</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        className="flex-1 p-4 bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-2xl outline-none dark:text-white text-sm"
+                        placeholder="e.g. Marina Beach, Chennai"
+                        value={formData.location}
+                        onChange={(e) =>
+                          setFormData({ ...formData, location: e.target.value })
+                        }
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSearchAddress}
+                        className="bg-blue-600 text-white px-6 rounded-2xl font-bold hover:bg-blue-700 transition"
+                      >
+                        <Search size={18} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Visual Map Picker */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase">{t`Pin Location`}</label>
+                    <LocationPicker
+                      selectedLocation={{
+                        lat: formData.latitude,
+                        lng: formData.longitude,
+                      }}
+                      onLocationSelect={async (lat, lng) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          latitude: lat,
+                          longitude: lng,
+                        }));
+                        // Auto-fetch address when pin is moved
+                        const res = await axios.get(
+                          `https://us1.locationiq.com/v1/reverse.php?key=${API_TOKEN}&lat=${lat}&lon=${lng}&format=json`,
+                        );
+                        if (res.data)
+                          setFormData((prev) => ({
+                            ...prev,
+                            location: res.data.display_name,
+                          }));
+                      }}
+                    />
+                  </div>
+
+                  {/* Manual Coordinates */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">{t`Latitude`}</label>
+                      <input
+                        type="number"
+                        step="any"
+                        className="w-full p-4 bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-2xl outline-none dark:text-white text-sm"
+                        value={formData.latitude}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            latitude: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">{t`Longitude`}</label>
+                      <input
+                        type="number"
+                        step="any"
+                        className="w-full p-4 bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-2xl outline-none dark:text-white text-sm"
+                        value={formData.longitude}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            longitude: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleManualCoords}
+                      className="h-[52px] bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:opacity-90 transition"
+                    >
+                      <RefreshCw size={16} /> {t`Update from Coords`}
+                    </button>
+                  </div>
                 </div>
-                <div className="space-y-1">
+
+                <div className="md:col-span-2 space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">{t`Type`}</label>
                   <select
                     className="w-full p-4 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-2xl outline-none text-slate-900 dark:text-white"
@@ -247,6 +379,7 @@ export default function AdminDashboard() {
                     <option value="Apartment">{t`Apartment`}</option>
                   </select>
                 </div>
+
                 <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-blue-50/50 dark:bg-slate-800 p-6 rounded-3xl border border-dashed border-blue-200 dark:border-slate-700">
                   <div>
                     <label className="block text-sm font-bold mb-2 dark:text-white">{t`Images`}</label>
@@ -267,6 +400,7 @@ export default function AdminDashboard() {
                     />
                   </div>
                 </div>
+
                 <div className="md:col-span-2 space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">{t`Description`}</label>
                   <textarea
@@ -277,6 +411,7 @@ export default function AdminDashboard() {
                     }
                   ></textarea>
                 </div>
+
                 <button
                   disabled={isUploading}
                   className="md:col-span-2 w-full py-5 bg-blue-900 text-white rounded-2xl font-bold text-lg hover:shadow-2xl transition-all disabled:bg-slate-300"
@@ -359,9 +494,7 @@ export default function AdminDashboard() {
                       <div className="mt-2">
                         <span
                           className={`text-[10px] font-black uppercase px-3 py-1 rounded-lg ${getStatusStyles(v.status)}`}
-                        >
-                          {t`${v.status}`}
-                        </span>
+                        >{t`${v.status}`}</span>
                       </div>
                       {v.feedback?.rating && (
                         <div className="flex items-center gap-1 mt-2 text-yellow-500">
