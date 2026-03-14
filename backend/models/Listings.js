@@ -12,12 +12,15 @@ const listingSchema = new mongoose.Schema({
     required: true,
   },
   status: { type: String, enum: ["Available", "Sold"], default: "Available" },
-  images: [{ type: String }], // Cloudinary URLs
+  images: [{ type: String }],
   videos: [{ type: String }],
   amenities: [String],
-  latitude: { type: Number, required: true, default: 13.0827 }, // Default to Chennai
-  longitude: { type: Number, required: true, default: 80.2707 },
+  latitude: { type: Number, required: true },
+  longitude: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
 });
+
+// ADD THIS: Index for Geospatial search
+listingSchema.index({ latitude: 1, longitude: 1 });
 
 module.exports = mongoose.model("Listing", listingSchema);
