@@ -12,22 +12,19 @@ router.post("/", async (req, res) => {
       name,
       email,
       phone,
-      message, // optional
+      message,
     });
     await newVisit.save();
-    res.status(201).json(newVisit);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-// ADMIN: Get all visits (populated with property title)
-router.get("/admin", async (req, res) => {
-  try {
-    const visits = await Visit.find()
-      .populate("propertyId", "title location")
-      .sort({ createdAt: -1 });
-    res.json(visits);
+    // NOTIFY ALL ADMINS
+    const io = req.app.get("io");
+    io.to("admins").emit("admin_notification", {
+      message: `New visit request from ${name}`,
+      type: "new_visit",
+      visitId: newVisit._id,
+    });
+
+    res.status(201).json(newVisit);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -42,7 +39,28 @@ router.patch("/:id/status", async (req, res) => {
       { status },
       { new: true },
     );
+
+    // NOTIFY THE SPECIFIC USER ONLY
+    const io = req.app.get("io");
+    // We emit to the room named after the userId
+    io.to(updated.userId.toString()).emit("user_notification", {
+      message: `Your visit status has been updated to: ${status}`,
+      status: status,
+    });
+
     res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ADMIN: Get all visits (populated with property title)
+router.get("/admin", async (req, res) => {
+  try {
+    const visits = await Visit.find()
+      .populate("propertyId", "title location")
+      .sort({ createdAt: -1 });
+    res.json(visits);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
