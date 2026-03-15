@@ -128,6 +128,16 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Increment view count
+router.patch("/:id/view", async (req, res) => {
+  try {
+    await Listing.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
+    res.status(200).json({ message: "View incremented" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // DELETE Property
 router.delete("/:id", async (req, res) => {
   try {

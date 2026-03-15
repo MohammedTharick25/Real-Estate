@@ -61,6 +61,7 @@ app.use("/api/listings", require("./routes/listingRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/visits", require("./routes/visitRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
 
 // Database Connection
 mongoose
