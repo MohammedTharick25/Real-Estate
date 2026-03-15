@@ -155,20 +155,35 @@ export default function AdminDashboard() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.title || !formData.price || !formData.location)
       return alert("Fill required fields!");
 
     setIsUploading(true);
+
+    const formattedAmenities = formData.amenities
+      ? formData.amenities.split(",").map((a) => a.trim())
+      : [];
+
     const data = new FormData();
-    Object.keys(formData).forEach((key) => data.append(key, formData[key]));
+
+    Object.keys(formData).forEach((key) => {
+      if (key !== "amenities") {
+        data.append(key, formData[key]);
+      }
+    });
+
+    // ✅ send amenities correctly
+    formattedAmenities.forEach((a) => data.append("amenities", a));
+
     Array.from(images).forEach((img) => data.append("images", img));
     Array.from(videos).forEach((vid) => data.append("videos", vid));
 
     try {
       await axios.post("http://localhost:5000/api/listings", data);
+
       alert(t`Success! Property Published.`);
 
-      // RESET FORM & FILES
       setFormData({
         title: "",
         price: "",
@@ -176,20 +191,25 @@ export default function AdminDashboard() {
         size: "",
         propertyType: "Land",
         description: "",
+        amenities: "",
         latitude: 13.0827,
         longitude: 80.2707,
       });
+
       setImages([]);
       setVideos([]);
+
       if (imageInputRef.current) imageInputRef.current.value = "";
       if (videoInputRef.current) videoInputRef.current.value = "";
 
       setActiveTab("manage");
+
       fetchListings();
       fetchStats();
     } catch (err) {
       console.error(err);
     }
+
     setIsUploading(false);
   };
 
@@ -264,8 +284,15 @@ export default function AdminDashboard() {
               {/* KPI Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <KPICard
-                  title={t`Revenue`}
-                  value={`₹${(stats.inventoryValue?.find((v) => v._id === "Sold")?.total || 0).toLocaleString()}`}
+                  title={t`Sold Value`}
+                  value={`₹${(stats?.kpis?.soldValue || 0).toLocaleString()}`}
+                  icon={<IndianRupee className="text-blue-600" />}
+                  trend="+12%"
+                />
+
+                <KPICard
+                  title={t`Commission Revenue`}
+                  value={`₹${(stats?.kpis?.revenue || 0).toLocaleString()}`}
                   icon={<IndianRupee className="text-blue-600" />}
                   trend="+12%"
                 />
@@ -452,11 +479,15 @@ export default function AdminDashboard() {
               animate={{ opacity: 1 }}
               className="bg-white dark:bg-slate-900 p-8 rounded-3xl border dark:border-slate-800 max-w-4xl mx-auto shadow-sm"
             >
-              <h2 className="text-2xl font-black mb-8 tracking-tight italic">{t`Publish Property`}</h2>
+              <h2 className="text-2xl font-black mb-8 tracking-tight italic">
+                {t`Publish Property`}
+              </h2>
+
               <form
                 onSubmit={handleSubmit}
                 className="grid md:grid-cols-2 gap-6"
               >
+                {/* TITLE */}
                 <FormInput
                   label={t`Title`}
                   value={formData.title}
@@ -464,17 +495,50 @@ export default function AdminDashboard() {
                     setFormData({ ...formData, title: e.target.value })
                   }
                 />
+
+                {/* PRICE */}
+                <div className="space-y-1">
+                  <FormInput
+                    label={t`Price (₹)`}
+                    value={formData.price}
+                    type="number"
+                    onChange={(e) =>
+                      setFormData({ ...formData, price: e.target.value })
+                    }
+                  />
+                  {formData.price && (
+                    <p className="text-xs text-green-600 font-bold">
+                      ₹{Number(formData.price).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+
                 <FormInput
-                  label={t`Price (₹)`}
-                  value={formData.price}
+                  label={t`Commission (%)`}
                   type="number"
+                  placeholder="e.g. 2"
+                  value={formData.commission || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, price: e.target.value })
+                    setFormData({ ...formData, commission: e.target.value })
                   }
                 />
 
+                {/* AMENITIES */}
+                <FormInput
+                  label={t`Amenities (comma separated)`}
+                  placeholder="Pool, Parking, Garden"
+                  value={formData.amenities || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, amenities: e.target.value })
+                  }
+                />
+
+                {/* LOCATION BLOCK */}
                 <div className="md:col-span-2 bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl space-y-4 border dark:border-slate-700">
-                  <p className="font-bold text-xs uppercase text-slate-400 tracking-widest">{t`Location & Coordinates`}</p>
+                  <p className="font-bold text-xs uppercase text-slate-400 tracking-widest">
+                    {t`Location & Coordinates`}
+                  </p>
+
                   <div className="flex gap-2">
                     <input
                       className="flex-1 p-4 rounded-xl border dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 ring-blue-500/20"
@@ -484,6 +548,7 @@ export default function AdminDashboard() {
                         setFormData({ ...formData, location: e.target.value })
                       }
                     />
+
                     <button
                       type="button"
                       onClick={handleSearchAddress}
@@ -492,6 +557,7 @@ export default function AdminDashboard() {
                       <Search size={20} />
                     </button>
                   </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <input
                       type="number"
@@ -505,6 +571,7 @@ export default function AdminDashboard() {
                         })
                       }
                     />
+
                     <input
                       type="number"
                       step="any"
@@ -518,6 +585,7 @@ export default function AdminDashboard() {
                       }
                     />
                   </div>
+
                   <LocationPicker
                     selectedLocation={{
                       lat: formData.latitude,
@@ -527,6 +595,7 @@ export default function AdminDashboard() {
                   />
                 </div>
 
+                {/* SIZE */}
                 <FormInput
                   label={t`Size (sqft)`}
                   value={formData.size}
@@ -534,8 +603,13 @@ export default function AdminDashboard() {
                     setFormData({ ...formData, size: e.target.value })
                   }
                 />
+
+                {/* TYPE */}
                 <div className="space-y-1">
-                  <label className="text-xs font-black uppercase text-slate-400">{t`Type`}</label>
+                  <label className="text-xs font-black uppercase text-slate-400">
+                    {t`Type`}
+                  </label>
+
                   <select
                     value={formData.propertyType}
                     className="w-full p-4 rounded-xl border dark:bg-slate-800 dark:border-slate-700 dark:text-white"
@@ -548,23 +622,45 @@ export default function AdminDashboard() {
                     <option value="Apartment">Apartment</option>
                   </select>
                 </div>
-                <textarea
-                  value={formData.description}
-                  rows="4"
-                  className="md:col-span-2 w-full p-5 rounded-2xl border dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none"
-                  placeholder={t`Description`}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                />
 
+                {/* DESCRIPTION */}
+                <div className="md:col-span-2">
+                  <textarea
+                    value={formData.description}
+                    rows="4"
+                    maxLength="500"
+                    className="w-full p-5 rounded-2xl border dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none"
+                    placeholder={t`Description`}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                  />
+                  <p className="text-xs text-slate-400 mt-1">
+                    {formData.description?.length || 0}/500
+                  </p>
+                </div>
+
+                {/* FEATURED TOGGLE */}
+                <div className="flex items-center gap-3 md:col-span-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.featured || false}
+                    onChange={(e) =>
+                      setFormData({ ...formData, featured: e.target.checked })
+                    }
+                  />
+                  <span className="text-sm font-bold">{t`Featured Property`}</span>
+                </div>
+
+                {/* IMAGE UPLOAD */}
                 <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="relative p-6 bg-slate-50 dark:bg-slate-800 border-2 border-dashed rounded-3xl text-center">
                     <label className="cursor-pointer flex flex-col items-center">
-                      <Plus
-                        className={`mb-1 ${images?.length > 0 ? "text-blue-500" : "text-slate-400"}`}
-                      />
-                      <span className="text-xs font-bold text-slate-500">{t`Photos`}</span>
+                      <Plus className="mb-1 text-slate-400" />
+                      <span className="text-xs font-bold text-slate-500">
+                        {t`Photos`}
+                      </span>
+
                       <input
                         type="file"
                         ref={imageInputRef}
@@ -574,18 +670,29 @@ export default function AdminDashboard() {
                         className="hidden"
                       />
                     </label>
+
                     {images?.length > 0 && (
-                      <div className="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-black px-2 py-1 rounded-full animate-bounce">
-                        {images.length} {t`Files`}
+                      <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                        {Array.from(images).map((img, i) => (
+                          <img
+                            key={i}
+                            src={URL.createObjectURL(img)}
+                            alt=""
+                            className="w-12 h-12 object-cover rounded-lg"
+                          />
+                        ))}
                       </div>
                     )}
                   </div>
+
+                  {/* VIDEO UPLOAD */}
                   <div className="relative p-6 bg-slate-50 dark:bg-slate-800 border-2 border-dashed rounded-3xl text-center">
                     <label className="cursor-pointer flex flex-col items-center">
-                      <Video
-                        className={`mb-1 ${videos?.length > 0 ? "text-blue-500" : "text-slate-400"}`}
-                      />
-                      <span className="text-xs font-bold text-slate-500">{t`Videos`}</span>
+                      <Video className="mb-1 text-slate-400" />
+                      <span className="text-xs font-bold text-slate-500">
+                        {t`Videos`}
+                      </span>
+
                       <input
                         type="file"
                         ref={videoInputRef}
@@ -595,14 +702,10 @@ export default function AdminDashboard() {
                         className="hidden"
                       />
                     </label>
-                    {videos?.length > 0 && (
-                      <div className="absolute top-2 right-2 bg-indigo-600 text-white text-[10px] font-black px-2 py-1 rounded-full animate-bounce">
-                        {videos.length} {t`Files`}
-                      </div>
-                    )}
                   </div>
                 </div>
 
+                {/* SUBMIT */}
                 <button
                   disabled={isUploading}
                   className="md:col-span-2 py-5 bg-blue-600 text-white rounded-xl font-black text-xl hover:shadow-xl transition-all"

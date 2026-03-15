@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Listing = require("../models/Listings");
 const Visit = require("../models/Visit");
-const mongoose = require("mongoose");
 
 router.get("/stats", async (req, res) => {
   try {
+    // BASIC KPIs
     const totalListings = await Listing.countDocuments();
     const totalVisits = await Visit.countDocuments();
 
@@ -15,7 +15,7 @@ router.get("/stats", async (req, res) => {
 
     const totalViews = viewsAgg[0]?.totalViews || 0;
 
-    // Inventory Value
+    // INVENTORY VALUE (Available vs Sold)
     const inventoryValue = await Listing.aggregate([
       {
         $group: {
@@ -25,7 +25,7 @@ router.get("/stats", async (req, res) => {
       },
     ]);
 
-    // Monthly visit trends
+    // MONTHLY VISIT TRENDS
     const months = [
       "Jan",
       "Feb",
@@ -60,15 +60,26 @@ router.get("/stats", async (req, res) => {
       count: visitMap[i + 1] || 0,
     }));
 
-    // Top performing properties
+    // TOP PERFORMING PROPERTIES
     const topProperties = await Listing.find()
       .sort({ views: -1 })
       .limit(6)
       .select("title views price");
 
-    // Conversion rate (important for real estate)
+    // CONVERSION RATE
     const conversionRate =
       totalViews > 0 ? ((totalVisits / totalViews) * 100).toFixed(2) : 0;
+
+    // SOLD VALUE + COMMISSION REVENUE
+    const soldListings = await Listing.find({ status: "Sold" });
+
+    let soldValue = 0;
+    let revenue = 0;
+
+    soldListings.forEach((p) => {
+      soldValue += p.price || 0;
+      revenue += (p.price * (p.commission || 0)) / 100;
+    });
 
     res.json({
       kpis: {
@@ -76,6 +87,8 @@ router.get("/stats", async (req, res) => {
         totalVisits,
         totalViews,
         conversionRate,
+        soldValue,
+        revenue,
       },
       inventoryValue,
       visitTrends,
@@ -83,6 +96,7 @@ router.get("/stats", async (req, res) => {
       avgRating: 4.5,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

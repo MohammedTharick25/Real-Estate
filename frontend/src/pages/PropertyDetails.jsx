@@ -20,13 +20,14 @@ import { useLingui } from "@lingui/react";
 
 export default function PropertyDetails() {
   useLingui();
-  const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [phone, setPhone] = useState("");
+  const [liked, setLiked] = useState(false);
+  const { user, updateWishlist } = useAuth();
 
   // EMI Calculator State
   const [loanAmount, setLoanAmount] = useState(0);
@@ -41,6 +42,7 @@ export default function PropertyDetails() {
         setProperty(res.data);
         setLoanAmount(res.data.price);
         setLoading(false);
+        setLiked(res.data.liked || false);
       })
       .catch((err) => console.error(err));
 
@@ -57,6 +59,26 @@ export default function PropertyDetails() {
       }
     }
   }, [id]);
+
+  const isFavorite = user?.user?.favorites?.includes(property?._id);
+
+  const toggleFavorite = async () => {
+    if (!user) return alert(t`Account created! Please login.`);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/users/favorites/toggle",
+        {
+          userId: user.user?.id,
+          propertyId: property?._id,
+        },
+      );
+
+      updateWishlist(res.data.favorites);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const viewTracked = useRef(false);
 
@@ -134,7 +156,10 @@ export default function PropertyDetails() {
                     key={i}
                     src={m}
                     controls
-                    className="w-full rounded-2xl"
+                    autoPlay
+                    muted
+                    playsInline
+                    className="w-full h-full rounded-2xl"
                   />
                 ) : (
                   <img key={i} src={m} className="w-full rounded-2xl" alt="" />
@@ -153,11 +178,32 @@ export default function PropertyDetails() {
           <ArrowLeft size={20} /> {t`Back`}
         </button>
         <div className="flex gap-2">
-          <button className="p-2 hover:bg-white rounded-full transition-colors">
+          <button
+            onClick={() =>
+              navigator.share
+                ? navigator.share({
+                    title: property.title,
+                    url: window.location.href,
+                  })
+                : navigator.clipboard.writeText(window.location.href)
+            }
+            className="p-2 hover:bg-white rounded-full transition-colors"
+          >
             <Share2 size={20} />
           </button>
-          <button className="p-2 hover:bg-white rounded-full transition-colors">
-            <Heart size={20} />
+          <button
+            onClick={toggleFavorite}
+            className="p-3 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-lg transition hover:scale-110"
+          >
+            <Heart
+              size={22}
+              fill={isFavorite ? "#ef4444" : "none"}
+              className={
+                isFavorite
+                  ? "text-red-500"
+                  : "text-slate-600 dark:text-slate-300"
+              }
+            />
           </button>
         </div>
       </div>
@@ -173,7 +219,15 @@ export default function PropertyDetails() {
               className={`overflow-hidden ${i === 0 ? "col-span-2 row-span-2" : ""}`}
             >
               {i === 0 && property.videos?.[0] ? (
-                <video src={m} className="w-full h-full object-cover" />
+                <video
+                  key={i}
+                  src={m}
+                  controls
+                  autoPlay
+                  muted
+                  playsInline
+                  className="w-full h-full rounded-2xl"
+                />
               ) : (
                 <img
                   src={m}
@@ -218,6 +272,25 @@ export default function PropertyDetails() {
               {property.description}
             </p>
           </div>
+
+          {property.amenities?.length > 0 && (
+            <div className="mb-12">
+              <h3 className="text-2xl font-black text-blue-600 mb-4">
+                {t`Amenities`}
+              </h3>
+
+              <div className="flex flex-wrap gap-3">
+                {property.amenities.map((a, i) => (
+                  <span
+                    key={i}
+                    className="px-4 py-2 bg-blue-50 dark:bg-slate-800 border dark:border-slate-700 text-sm font-bold rounded-xl"
+                  >
+                    {a}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-xl">
             <h3 className="text-xl font-black mb-6 flex items-center gap-2">

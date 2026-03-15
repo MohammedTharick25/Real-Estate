@@ -290,15 +290,19 @@ export default function Profile() {
                                 <div className="flex justify-between items-center">
                                   <div>
                                     <p className="font-bold dark:text-white">
-                                      {v.propertyId?.title}
+                                      {v.propertyId?.title ||
+                                        "Property no longer available"}
                                     </p>
                                     <p className="text-xs text-slate-400">
-                                      {v.propertyId?.location}
+                                      {v.propertyId?.location ||
+                                        "Location unavailable"}
                                     </p>
                                   </div>
                                   <span
                                     className={`text-[10px] font-black uppercase px-3 py-1 rounded-lg ${getStatusStyles(v.status)}`}
-                                  >{t`${v.status}`}</span>
+                                  >
+                                    {v.status}
+                                  </span>
                                 </div>
                                 {v.status === "visited" &&
                                   !v.feedback?.rating && (

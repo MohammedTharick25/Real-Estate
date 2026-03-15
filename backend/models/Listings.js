@@ -16,6 +16,8 @@ const listingSchema = new mongoose.Schema({
   videos: [{ type: String }],
   amenities: [String],
   views: { type: Number, default: 0 },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  commission: { type: Number, default: 0 },
   latitude: { type: Number, required: true },
   longitude: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },

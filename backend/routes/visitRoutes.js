@@ -69,11 +69,16 @@ router.get("/admin", async (req, res) => {
 // USER: Get my visits
 router.get("/user/:userId", async (req, res) => {
   try {
-    const visits = await Visit.find({ userId: req.params.userId }).populate(
-      "propertyId",
-      "title images",
-    );
-    res.json(visits);
+    const visits = await Visit.find({ userId: req.params.userId })
+      .populate({
+        path: "propertyId",
+        select: "title location images",
+      })
+      .sort({ createdAt: -1 });
+
+    const filteredVisits = visits.filter((v) => v.propertyId !== null);
+
+    res.json(filteredVisits);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

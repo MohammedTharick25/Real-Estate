@@ -4,6 +4,7 @@ const Listing = require("../models/Listings"); // Ensure this matches your filen
 const multer = require("multer");
 const { storage } = require("../config/cloudinary");
 const upload = multer({ storage });
+const Visit = require("../models/Visit"); // Import Visit model for cleanup on delete
 
 // CREATE Listing (Consolidated & Fixed)
 router.post(
@@ -27,8 +28,14 @@ router.post(
         price: Number(req.body.price),
         images: imageUrls,
         videos: videoUrls,
+        commission: Number(req.body.commission || 0),
         latitude: Number(req.body.latitude), // Add this
         longitude: Number(req.body.longitude),
+        amenities: Array.isArray(req.body.amenities)
+          ? req.body.amenities
+          : req.body.amenities
+            ? [req.body.amenities]
+            : [],
       });
 
       await newListing.save();
@@ -138,10 +145,45 @@ router.patch("/:id/view", async (req, res) => {
   }
 });
 
+router.patch("/:id/like", async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const listing = await Listing.findById(req.params.id);
+
+    if (!listing) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+
+    if (!listing.likes) listing.likes = [];
+
+    const alreadyLiked = listing.likes.includes(userId);
+
+    if (alreadyLiked) {
+      listing.likes = listing.likes.filter((id) => id.toString() !== userId);
+    } else {
+      listing.likes.push(userId);
+    }
+
+    await listing.save();
+
+    res.json({
+      liked: !alreadyLiked,
+      likesCount: listing.likes.length,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // DELETE Property
 router.delete("/:id", async (req, res) => {
   try {
     await Listing.findByIdAndDelete(req.params.id);
+
+    await Visit.deleteMany({ propertyId: req.params.id });
+
     res.json({ message: "Property deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
