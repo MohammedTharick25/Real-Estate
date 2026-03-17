@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { Toaster, toast } from "react-hot-toast";
+
 import {
   Plus,
   Trash2,
@@ -23,6 +25,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { t } from "@lingui/macro";
 import LocationPicker from "../components/LocationPicker";
+import Swal from "sweetalert2";
 import {
   BarChart,
   Bar,
@@ -57,6 +60,8 @@ export default function AdminDashboard() {
     size: "",
     propertyType: "Land",
     description: "",
+    featured: false, // 👈 Add this
+    amenities: "",
     latitude: 13.0827,
     longitude: 80.2707,
   });
@@ -67,6 +72,7 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/admin/stats");
+      console.log("Full Stats from Server:", res.data);
       setStats(res.data);
     } catch (err) {
       console.error("Stats error", err);
@@ -98,30 +104,51 @@ export default function AdminDashboard() {
     await axios.patch(`http://localhost:5000/api/listings/${id}/status`, {
       status: newStatus,
     });
-    fetchListings();
-    fetchStats();
+    toast.success(t`Status updated to ${newStatus}`);
+    await fetchListings();
+    await fetchStats();
   };
 
   const updateVisitStatus = async (id, status) => {
     await axios.patch(`http://localhost:5000/api/visits/${id}/status`, {
       status,
     });
-    fetchVisits();
-    fetchStats();
+    await fetchVisits();
+    await fetchStats();
+    if (status === "scheduled") {
+      toast.success(t`Visit scheduled successfully!`);
+    } else if (status === "visited") {
+      toast.success(t`Visit marked as completed!`);
+    } else if (status === "cancelled") {
+      toast.error(t`Visit cancelled.`);
+    }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm(t`Delete permanently?`)) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to undo this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
       await axios.delete(`http://localhost:5000/api/listings/${id}`);
-      fetchListings();
-      fetchStats();
+      await fetchListings();
+      await fetchStats();
+
+      Swal.fire("Deleted!", "Property has been deleted.", "success");
     }
   };
 
   const API_TOKEN = import.meta.env.VITE_LOCATIONIQ_ACCESS_TOKEN;
 
   const handleSearchAddress = async () => {
-    if (!formData.location) return alert(t`Please type an address first`);
+    if (!formData.location)
+      return toast.error(t`Enter a location to search!`, { duration: 3000 });
     try {
       const res = await axios.get(
         `https://us1.locationiq.com/v1/search.php?key=${API_TOKEN}&q=${encodeURIComponent(formData.location)}&format=json`,
@@ -134,9 +161,15 @@ export default function AdminDashboard() {
           longitude: parseFloat(lon),
           location: display_name,
         }));
+        toast.success(t`Location synced!`);
+      } else {
+        toast.error(t`Location not found. Try a different query.`, {
+          duration: 4000,
+        });
       }
     } catch (err) {
       console.error(err);
+      toast.error(t`Failed to sync location.`);
     }
   };
 
@@ -157,7 +190,7 @@ export default function AdminDashboard() {
     e.preventDefault();
 
     if (!formData.title || !formData.price || !formData.location)
-      return alert("Fill required fields!");
+      return toast.error(t`Fill required fields!`, { duration: 3000 });
 
     setIsUploading(true);
 
@@ -179,36 +212,28 @@ export default function AdminDashboard() {
     Array.from(images).forEach((img) => data.append("images", img));
     Array.from(videos).forEach((vid) => data.append("videos", vid));
 
-    try {
-      await axios.post("http://localhost:5000/api/listings", data);
-
-      alert(t`Success! Property Published.`);
-
-      setFormData({
-        title: "",
-        price: "",
-        location: "",
-        size: "",
-        propertyType: "Land",
-        description: "",
-        amenities: "",
-        latitude: 13.0827,
-        longitude: 80.2707,
-      });
-
-      setImages([]);
-      setVideos([]);
-
-      if (imageInputRef.current) imageInputRef.current.value = "";
-      if (videoInputRef.current) videoInputRef.current.value = "";
-
-      setActiveTab("manage");
-
-      fetchListings();
-      fetchStats();
-    } catch (err) {
-      console.error(err);
-    }
+    toast.promise(
+      axios.post("http://localhost:5000/api/listings", data),
+      {
+        loading: t`Uploading property and media...`,
+        success: () => {
+          setFormData({
+            /* reset logic */
+          });
+          setImages([]);
+          setVideos([]);
+          fetchListings();
+          fetchStats();
+          setActiveTab("manage");
+          return <b>{t`Property Published Successfully!`}</b>;
+        },
+        error: <b>{t`Could not publish property.`}</b>,
+      },
+      {
+        style: { borderRadius: "15px", background: "#333", color: "#fff" },
+        success: { duration: 5000, icon: "🏠" },
+      },
+    );
 
     setIsUploading(false);
   };
@@ -221,28 +246,36 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 flex flex-col md:flex-row transition-all">
-      {/* Mobile Top Bar */}
-      <div className="md:hidden bg-slate-900 p-4 flex justify-between items-center text-white">
+      {/* Mobile and Tablet Top Bar */}
+      <div className="lg:hidden bg-slate-900 p-4 flex justify-between items-center text-white sticky top-0 z-[60] shadow-xl">
         <h2 className="font-black uppercase tracking-tighter italic">
           AdminHub
         </h2>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)}>
-          <Menu />
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 bg-slate-800 rounded-lg"
+        >
+          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Sidebar */}
       <AnimatePresence>
-        {(sidebarOpen || window.innerWidth >= 768) && (
+        {(sidebarOpen || window.innerWidth >= 1024) && (
           <motion.aside
             initial={{ x: -300 }}
             animate={{ x: 0 }}
             exit={{ x: -300 }}
-            className={`fixed md:static inset-y-0 left-0 z-50 w-72 bg-slate-900 text-white p-6 flex flex-col transition-all ${sidebarOpen ? "block" : "hidden md:flex"}`}
+            className={`fixed md:sticky top-0 left-0 z-50 w-72 h-screen bg-slate-900 text-white p-6 flex flex-col overflow-y-auto transition-all ${
+              sidebarOpen ? "block" : "hidden lg:flex"
+            }`}
           >
             <h2 className="text-xl font-black uppercase mb-10 px-2 tracking-widest italic">
               Admin<span className="text-blue-500">Hub</span>
             </h2>
+            <button className="lg:hidden" onClick={() => setSidebarOpen(false)}>
+              <X />
+            </button>
             <nav className="space-y-2 flex-1">
               <SideBtn
                 active={activeTab === "overview"}
@@ -316,9 +349,28 @@ export default function AdminDashboard() {
                 />
                 <KPICard
                   title={t`Rating`}
-                  value={`${(stats.avgRating || 0).toFixed(1)}/5`}
-                  icon={<Star className="text-amber-600" />}
-                  trend="Avg"
+                  /* Ensure we handle both potential locations: stats.avgRating or stats.kpis.avgRating */
+                  value={
+                    stats?.kpis?.avgRating !== undefined
+                      ? `${Number(stats.kpis.avgRating).toFixed(1)}/5`
+                      : "0.0/5"
+                  }
+                  icon={
+                    <Star
+                      className={
+                        stats?.kpis?.avgRating > 0
+                          ? "text-amber-500"
+                          : "text-slate-300"
+                      }
+                    />
+                  }
+                  /* Dynamically show review count */
+                  trend={
+                    stats?.kpis?.reviewCount !== undefined
+                      ? `${stats.kpis.reviewCount} ${t`Reviews`}`
+                      : t`No Reviews`
+                  }
+                  color="amber"
                 />
               </div>
 
@@ -490,6 +542,7 @@ export default function AdminDashboard() {
                 {/* TITLE */}
                 <FormInput
                   label={t`Title`}
+                  placeholder={t`Luxurious 3BHK in Downtown`}
                   value={formData.title}
                   onChange={(e) =>
                     setFormData({ ...formData, title: e.target.value })
@@ -500,6 +553,7 @@ export default function AdminDashboard() {
                 <div className="space-y-1">
                   <FormInput
                     label={t`Price (₹)`}
+                    placeholder={t`Enter price`}
                     value={formData.price}
                     type="number"
                     onChange={(e) =>
@@ -526,7 +580,7 @@ export default function AdminDashboard() {
                 {/* AMENITIES */}
                 <FormInput
                   label={t`Amenities (comma separated)`}
-                  placeholder="Pool, Parking, Garden"
+                  placeholder={t`Pool, Parking, Garden`}
                   value={formData.amenities || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, amenities: e.target.value })
@@ -597,7 +651,9 @@ export default function AdminDashboard() {
 
                 {/* SIZE */}
                 <FormInput
-                  label={t`Size (sqft)`}
+                  className="flex-1 p-4 rounded-xl border dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 ring-blue-500/20"
+                  label={t`Size (sqft/Acres)`}
+                  placeholder={t`e.g. 1500 Sq Ft or 0.5 Acres`}
                   value={formData.size}
                   onChange={(e) =>
                     setFormData({ ...formData, size: e.target.value })
@@ -740,7 +796,9 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                     <span
-                      className={`text-[10px] font-black uppercase px-2 py-1 rounded-lg ${v.status === "scheduled" ? "bg-blue-100 text-blue-600" : "bg-slate-100"}`}
+                      className={`text-[10px] font-black uppercase px-2 py-1 rounded-lg ${v.status === "scheduled" ? "bg-blue-100 text-blue-600" : "bg-slate-100"}
+                      ${v.status === "visited" ? "bg-green-100 text-green-600" : "bg-slate-100 dark:bg-slate-800"}
+                      ${v.status === "cancelled" ? "bg-red-100 text-red-600" : "bg-slate-100 dark:bg-slate-800"}`}
                     >
                       {v.status}
                     </span>
@@ -819,24 +877,37 @@ function SideBtn({ active, icon, label, onClick }) {
   );
 }
 
-function KPICard({ title, value, icon, trend }) {
+function KPICard({ title, value, icon, trend, color }) {
+  const colorMap = {
+    blue: "bg-blue-100 text-blue-600",
+    emerald: "bg-emerald-100 text-emerald-600",
+    purple: "bg-purple-100 text-purple-600",
+    amber: "bg-amber-100 text-amber-600",
+    slate: "bg-slate-100 text-slate-600",
+  };
+
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border dark:border-slate-800 shadow-sm transition-all hover:scale-[1.02]">
+    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
       <div className="flex justify-between items-start mb-4">
-        <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+        {/* Dynamic color background for icon */}
+        <div className={`p-3 rounded-2xl ${colorMap[color] || colorMap.slate}`}>
           {icon}
         </div>
-        <div className="text-[10px] font-black text-emerald-500">{trend}</div>
+        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded-lg">
+          {trend}
+        </div>
       </div>
-      <h4 className="text-slate-500 font-bold text-xs uppercase">{title}</h4>
-      <p className="text-2xl font-black mt-1 dark:text-white tracking-tighter">
+      <h4 className="text-slate-500 font-bold text-xs uppercase tracking-tighter">
+        {title}
+      </h4>
+      <p className="text-2xl font-black mt-1 dark:text-white tracking-tight">
         {value}
       </p>
     </div>
   );
 }
 
-function FormInput({ label, value, type = "text", onChange }) {
+function FormInput({ label, value, type = "text", onChange, placeholder }) {
   return (
     <div className="space-y-2">
       <label className="text-xs font-black uppercase text-slate-400 ml-1">
@@ -846,6 +917,7 @@ function FormInput({ label, value, type = "text", onChange }) {
         value={value}
         type={type}
         onChange={onChange}
+        placeholder={placeholder}
         className="w-full p-4 rounded-xl border dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 ring-blue-500/20"
       />
     </div>

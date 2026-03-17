@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 import {
   MapPin,
   Ruler,
@@ -96,8 +97,9 @@ export default function PropertyDetails() {
 
   const handleRequestVisit = async (e) => {
     e.preventDefault();
-    if (!user) return alert(t`Please login to request a visit.`);
-    if (!phone) return alert(t`Please enter your mobile number.`);
+    if (!user)
+      return toast.error(t`Please login to request a visit.`, { icon: "🔒" });
+    if (!phone) return toast.error(t`Please enter your mobile number.`);
 
     try {
       await axios.post("http://localhost:5000/api/visits", {
@@ -107,10 +109,14 @@ export default function PropertyDetails() {
         email: user.user.email,
         phone: phone,
       });
-      alert(t`Visit request sent successfully!`);
+      toast.success(t`Visit request sent! We will contact you soon.`, {
+        duration: 6000,
+        icon: "📅",
+        style: { border: "2px solid #2563eb", padding: "16px" },
+      });
       setPhone("");
     } catch (err) {
-      alert(t`Failed to send visit request`);
+      toast.error(t`Failed to send visit request, Try again`, { icon: "❌" });
     }
   };
 

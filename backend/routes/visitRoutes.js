@@ -60,6 +60,14 @@ router.get("/admin", async (req, res) => {
     const visits = await Visit.find()
       .populate("propertyId", "title location")
       .sort({ createdAt: -1 });
+
+    const orphans = visits.filter((v) => !v.propertyId);
+    if (orphans.length > 0) {
+      const orphanIds = orphans.map((v) => v._id);
+      await Visit.deleteMany({ _id: { $in: orphanIds } });
+      // Re-fetch clean list
+      visits = visits.filter((v) => v.propertyId);
+    }
     res.json(visits);
   } catch (err) {
     res.status(500).json({ error: err.message });

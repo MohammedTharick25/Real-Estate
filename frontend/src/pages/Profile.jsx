@@ -20,6 +20,7 @@ import axios from "axios";
 import { t } from "@lingui/macro";
 import { useLingui } from "@lingui/react";
 import PropertyCard from "../components/PropertyCard";
+import { toast } from "react-hot-toast";
 
 export default function Profile() {
   const { i18n } = useLingui();
@@ -81,10 +82,10 @@ export default function Profile() {
         `http://localhost:5000/api/visits/${visitId}/feedback`,
         feedbackData,
       );
-      alert(t`Message sent successfully!`);
+      toast.success(t`Message sent successfully!`);
       fetchMyVisits();
     } catch (err) {
-      alert(t`Failed to send message`);
+      toast.error(t`Failed to send message`);
     }
   };
 
@@ -114,7 +115,7 @@ export default function Profile() {
       setIsEditing(false);
       setPreviewImage(null);
     } catch (err) {
-      alert(t`Profile update failed`);
+      toast.error(t`Profile update failed`);
     } finally {
       setLoading(false);
     }

@@ -81,6 +81,24 @@ router.get("/stats", async (req, res) => {
       revenue += (p.price * (p.commission || 0)) / 100;
     });
 
+    // 5. Customer Satisfaction (Avg Rating)
+    const ratings = await Visit.aggregate([
+      {
+        // Only look for visits where a rating was actually submitted
+        $match: { "feedback.rating": { $exists: true, $ne: null } },
+      },
+      {
+        $group: {
+          _id: null,
+          avgRating: { $avg: "$feedback.rating" },
+          totalReviews: { $sum: 1 }, // Also count how many people rated
+        },
+      },
+    ]);
+
+    const avgRating = ratings.length > 0 ? ratings[0].avgRating : 0;
+    const reviewCount = ratings.length > 0 ? ratings[0].totalReviews : 0;
+
     res.json({
       kpis: {
         totalListings,
@@ -89,6 +107,8 @@ router.get("/stats", async (req, res) => {
         conversionRate,
         soldValue,
         revenue,
+        avgRating: parseFloat(avgRating.toFixed(1)), // Ensure it's a clean number
+        reviewCount: reviewCount,
       },
       inventoryValue,
       visitTrends,

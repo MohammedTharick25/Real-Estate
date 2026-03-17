@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
@@ -82,8 +83,32 @@ function App() {
   return (
     <>
       <I18nProvider i18n={i18n}>
-        <Toaster />
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          gutter={8}
+          toastOptions={{
+            // Global styles for all toasts
+            duration: 5000,
+            style: {
+              background: "#1e293b", // Slate 800
+              color: "#fff",
+              borderRadius: "20px",
+              padding: "12px 24px",
+              fontSize: "14px",
+              fontWeight: "bold",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)",
+            },
+            success: {
+              iconTheme: { primary: "#10b981", secondary: "#fff" },
+            },
+            error: {
+              iconTheme: { primary: "#ef4444", secondary: "#fff" },
+            },
+          }}
+        />
         <Router>
+          <ScrollToTop />
           <Navbar />
           <div className="min-h-screen bg-slate-50 flex flex-col">
             <main className="flex-grow">
