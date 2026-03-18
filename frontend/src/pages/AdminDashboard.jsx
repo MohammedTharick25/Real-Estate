@@ -27,6 +27,15 @@ import { t } from "@lingui/macro";
 import LocationPicker from "../components/LocationPicker";
 import Swal from "sweetalert2";
 import {
+  UserX,
+  UserCheck,
+  ShieldAlert,
+  Mail,
+  ShieldCheck,
+  Download,
+} from "lucide-react";
+
+import {
   BarChart,
   Bar,
   XAxis,
@@ -68,6 +77,19 @@ export default function AdminDashboard() {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
 
+  const [users, setUsers] = useState([]);
+  const [userSearch, setUserSearch] = useState("");
+  const [userFilter, setUserFilter] = useState("all");
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/users/all");
+      setUsers(res.data);
+    } catch (err) {
+      console.error("User fetch error", err);
+    }
+  };
+
   // FETCH FUNCTIONS
   const fetchStats = async () => {
     try {
@@ -94,7 +116,12 @@ export default function AdminDashboard() {
     fetchListings();
     fetchVisits();
     fetchStats();
-    const poll = setInterval(fetchStats, 10000); // Auto-update every 10s
+    fetchUsers();
+
+    const poll = setInterval(() => {
+      fetchStats();
+      fetchUsers();
+    }, 5000); // Auto-update every 5s
     return () => clearInterval(poll);
   }, []);
 
@@ -107,6 +134,49 @@ export default function AdminDashboard() {
     toast.success(t`Status updated to ${newStatus}`);
     await fetchListings();
     await fetchStats();
+  };
+
+  const handleToggleBlock = async (userId) => {
+    try {
+      const res = await axios.patch(
+        `http://localhost:5000/api/users/${userId}/block`,
+      );
+      toast.success(res.data.message);
+      fetchUsers();
+    } catch (err) {
+      toast.error("Failed to update user status");
+    }
+  };
+
+  const exportUsersToCSV = () => {
+    const headers = ["Name,Email,Role,Status,Favorites\n"];
+    const rows = users.map(
+      (u) =>
+        `${u.name},${u.email},${u.role},${u.isBlocked ? "Blocked" : "Active"},${u.favorites?.length || 0}`,
+    );
+    const blob = new Blob([headers + rows.join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `User_Report_${new Date().toLocaleDateString()}.csv`;
+    a.click();
+  };
+
+  const handleDeleteUser = async (userId) => {
+    const result = await Swal.fire({
+      title: t`Delete User?`,
+      text: t`This action is permanent and will remove all user data.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      confirmButtonText: t`Yes, delete`,
+    });
+
+    if (result.isConfirmed) {
+      await axios.delete(`http://localhost:5000/api/users/${userId}`);
+      fetchUsers();
+      Swal.fire("Deleted!", "User removed.", "success");
+    }
   };
 
   const updateVisitStatus = async (id, status) => {
@@ -381,6 +451,15 @@ export default function AdminDashboard() {
             label={t`Inventory`}
             onClick={() => {
               setActiveTab("manage");
+              setSidebarOpen(false);
+            }}
+          />
+          <SideBtn
+            active={activeTab === "users"}
+            icon={<Users size={20} />}
+            label={t`Community`}
+            onClick={() => {
+              setActiveTab("users");
               setSidebarOpen(false);
             }}
           />
@@ -861,6 +940,182 @@ export default function AdminDashboard() {
                 </button>
               </form>
             </motion.div>
+          )}
+
+          {activeTab === "users" && (
+            <div className="space-y-6">
+              {/* Header & Search Bar */}
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-3xl border dark:border-slate-800 shadow-sm">
+                <div>
+                  <h2 className="text-2xl font-black tracking-tight">{t`User Directory`}</h2>
+                  <p className="text-slate-500 text-sm">
+                    {users.length} {t`Registered members`}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <div className="relative flex-1">
+                    <Search
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={18}
+                    />
+                    <input
+                      type="text"
+                      placeholder={t`Search by name or email...`}
+                      className="pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl w-full border-none outline-none focus:ring-2 ring-blue-500/20"
+                      value={userSearch}
+                      onChange={(e) => setUserSearch(e.target.value)}
+                    />
+                  </div>
+                  <button className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl hover:bg-blue-50 transition-colors">
+                    <Download
+                      size={20}
+                      className="text-slate-600 dark:text-slate-400"
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Users Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Change the mapping for users to include Account Age and Self-Protection */}
+                {users
+                  .filter(
+                    (u) =>
+                      u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
+                      u.email.toLowerCase().includes(userSearch.toLowerCase()),
+                  )
+                  .map((u) => {
+                    // 🛡️ Self-Protection: Identify yourself (the master admin)
+                    // Replace 'your-email@example.com' with your actual admin email
+                    const isMasterAdmin = u.email === "Estatera@gmail.com";
+
+                    return (
+                      <motion.div
+                        layout
+                        key={u._id}
+                        className={`relative group bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border transition-all hover:shadow-2xl hover:shadow-blue-500/10 ${u.isBlocked ? "border-red-200 bg-red-50/30" : "border-slate-100 dark:border-slate-800"}`}
+                      >
+                        {/* NEW: Account Age Tag */}
+                        <div className="flex gap-2">
+                          {isMasterAdmin ? (
+                            // Show a "Master Admin" label instead of buttons for you
+                            <div className="w-full py-3 bg-blue-600 text-white text-center rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                              <ShieldCheck size={14} /> System Owner (Protected)
+                            </div>
+                          ) : (
+                            // Show control buttons for everyone else
+                            <>
+                              <button
+                                onClick={() => handleToggleBlock(u._id)}
+                                className={`flex-1 py-3 rounded-2xl font-bold text-xs transition-all ${
+                                  u.isBlocked
+                                    ? "bg-emerald-500 text-white"
+                                    : "bg-slate-900 text-white"
+                                }`}
+                              >
+                                {u.isBlocked ? "Unblock User" : "Block User"}
+                              </button>
+
+                              <button
+                                onClick={() => handleDeleteUser(u._id)}
+                                className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-4 mb-6">
+                          <img
+                            src={
+                              u.image ||
+                              `https://ui-avatars.com/api/?name=${u.name}&background=random`
+                            }
+                            className="w-16 h-16 rounded-2xl object-cover ring-4 ring-white dark:ring-slate-800 shadow-lg"
+                            alt=""
+                          />
+                          <div className="flex-1 overflow-hidden">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-bold dark:text-white truncate">
+                                {u.name}
+                              </h4>
+                              {isMasterAdmin && (
+                                <ShieldCheck
+                                  size={16}
+                                  className="text-blue-500"
+                                />
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-500 truncate">
+                              {u.email}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                          <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <p className="text-[10px] uppercase font-black text-slate-400 mb-1">
+                              Engagement
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Star size={12} className="text-amber-500" />
+                              <span className="font-bold text-sm dark:text-white">
+                                {u.favorites?.length || 0} Saved
+                              </span>
+                            </div>
+                          </div>
+                          <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <p className="text-[10px] uppercase font-black text-slate-400 mb-1">
+                              Status
+                            </p>
+                            <span
+                              className={`text-[10px] font-black px-2 py-0.5 rounded-full ${u.isBlocked ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-600"}`}
+                            >
+                              {u.isBlocked ? "SUSPENDED" : "ACTIVE"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          {/* Only show buttons if the user is NOT the Master Admin */}
+                          {!isMasterAdmin ? (
+                            <>
+                              <button
+                                onClick={() => handleToggleBlock(u._id)}
+                                className={`flex-1 py-3 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+                                  u.isBlocked
+                                    ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                                    : "bg-slate-900 text-white hover:bg-red-600"
+                                }`}
+                              >
+                                {u.isBlocked ? (
+                                  <UserCheck size={16} />
+                                ) : (
+                                  <UserX size={16} />
+                                )}
+                                {u.isBlocked ? "Restore User" : "Block Access"}
+                              </button>
+
+                              <button
+                                onClick={() => handleDeleteUser(u._id)}
+                                className="p-3 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-red-50 hover:text-red-500 rounded-2xl transition-all"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </>
+                          ) : (
+                            <div className="w-full py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 text-center rounded-2xl text-[10px] font-black uppercase tracking-tighter">
+                              System Master (Protected)
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+              </div>
+            </div>
           )}
 
           {/* 3. VISITS VIEW (Unchanged as requested) */}

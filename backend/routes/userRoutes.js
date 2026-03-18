@@ -68,4 +68,56 @@ router.get("/favorites/:userId", async (req, res) => {
   }
 });
 
+// 4. GET ALL USERS (Admin Only)
+router.get("/all", async (req, res) => {
+  try {
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/status/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json({ isBlocked: user.isBlocked, role: user.role });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// 5. TOGGLE BLOCK STATUS
+router.patch("/:id/block", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    // 🛡️ PROTECT YOURSELF: Change this to your actual email
+    if (user.email === "Estatera@gmail.com") {
+      return res.status(403).json({ error: "Master Admin cannot be blocked." });
+    }
+
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+    res.json({ message: `User ${user.isBlocked ? "blocked" : "unblocked"}` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 6. DELETE USER
+router.delete("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user.email === "admin@yourdomain.com") {
+      return res.status(403).json({ error: "Master Admin cannot be deleted." });
+    }
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: "User deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
