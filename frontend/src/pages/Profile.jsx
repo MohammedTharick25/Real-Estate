@@ -48,10 +48,12 @@ export default function Profile() {
 
   // Fetch Data on Load
   useEffect(() => {
-    if (user?.user?.id) {
-      fetchMyVisits();
-      fetchFavorites();
-    }
+    setInterval(() => {
+      if (user?.user?.id) {
+        fetchMyVisits();
+        fetchFavorites();
+      }
+    }, 3000); // Poll every 3 seconds for updates
   }, [user?.user?.id, user?.user?.favorites]); // Refetch if ID changes or wishlist updates
 
   const fetchMyVisits = async () => {
@@ -242,16 +244,82 @@ export default function Profile() {
                         </div>
                       </div>
                     </div>
-                    <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
-                      <h3 className="font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <Shield size={18} /> {t`Permissions`}
-                      </h3>
-                      <p className="text-slate-500 dark:text-slate-400 text-sm">
-                        {t`Current Role`}{" "}
-                        <span className="font-black text-slate-900 dark:text-white uppercase">
-                          {user.user.role}
-                        </span>
-                      </p>
+                    <div className="relative group p-6 bg-white dark:bg-slate-800/50 rounded-[2rem] border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-500 overflow-hidden">
+                      {/* Abstract Background Decoration */}
+                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors" />
+
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-blue-600/10 dark:bg-blue-500/20 rounded-xl text-blue-600 dark:text-blue-400">
+                              <Shield size={20} strokeWidth={2.5} />
+                            </div>
+                            <div>
+                              <h3 className="font-black text-slate-800 dark:text-white leading-none">
+                                {t`Security & Access`}
+                              </h3>
+                              <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-1">
+                                {t`System Identity`}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Dynamic Status Pill */}
+                          <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tight">
+                              {t`Verified`}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                              {t`Account Tier`}
+                            </span>
+                            <span
+                              className={`px-3 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider shadow-sm 
+          ${
+            user.user.role === "admin"
+              ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+              : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
+          }`}
+                            >
+                              {user.user.role}
+                            </span>
+                          </div>
+
+                          {/* Role Capabilities Summary - Professional Touch */}
+                          <div className="pt-2 px-1">
+                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 italic">
+                              {t`Authorized Capabilities`}
+                            </p>
+                            <div className="grid grid-cols-2 gap-2">
+                              {user.user.role === "admin" ? (
+                                <>
+                                  <CapabilityItem label={t`Full Access`} />
+                                  <CapabilityItem
+                                    label={t`Property Management`}
+                                  />
+                                  {/*user */}
+                                  <CapabilityItem
+                                    label={t`Inventory Control`}
+                                  />
+                                  <CapabilityItem label={t`Financial Logs`} />
+                                </>
+                              ) : (
+                                <>
+                                  <CapabilityItem label={t`Property Tours`} />
+                                  <CapabilityItem label={t`Request Visits`} />
+                                  <CapabilityItem label={t`Save Favorites`} />
+                                  <CapabilityItem label={t`Direct Chat`} />
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -460,6 +528,17 @@ export default function Profile() {
           </div>
         </div>
       </motion.div>
+    </div>
+  );
+}
+
+function CapabilityItem({ label }) {
+  return (
+    <div className="flex items-center gap-2 group/item">
+      <div className="w-1 h-1 bg-blue-500 rounded-full group-hover/item:w-3 transition-all" />
+      <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+        {label}
+      </span>
     </div>
   );
 }

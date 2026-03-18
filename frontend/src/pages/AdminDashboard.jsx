@@ -110,17 +110,29 @@ export default function AdminDashboard() {
   };
 
   const updateVisitStatus = async (id, status) => {
-    await axios.patch(`http://localhost:5000/api/visits/${id}/status`, {
-      status,
-    });
-    await fetchVisits();
-    await fetchStats();
-    if (status === "scheduled") {
-      toast.success(t`Visit scheduled successfully!`);
-    } else if (status === "visited") {
-      toast.success(t`Visit marked as completed!`);
-    } else if (status === "cancelled") {
-      toast.error(t`Visit cancelled.`);
+    try {
+      // We use toast.promise to handle the loading state and the final message from backend
+      await toast.promise(
+        axios.patch(`http://localhost:5000/api/visits/${id}/status`, {
+          status,
+        }),
+        {
+          loading: t`Updating status...`,
+          success: (res) => {
+            // fetch data in background to update UI
+            fetchVisits();
+            fetchStats();
+            // This returns the message we just added to the backend
+            return res.data.message;
+          },
+          error: t`Failed to update status.`,
+        },
+        {
+          style: { borderRadius: "10px", background: "#333", color: "#fff" },
+        },
+      );
+    } catch (err) {
+      console.error("Update error:", err);
     }
   };
 
@@ -245,22 +257,35 @@ export default function AdminDashboard() {
     0;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 flex flex-col md:flex-row transition-all">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 flex flex-col lg:flex-row transition-all">
       {/* Mobile and Tablet Top Bar */}
-      <div className="lg:hidden bg-slate-900 p-4 flex justify-between items-center text-white sticky top-0 z-[60] shadow-xl">
+      <div className="lg:hidden bg-slate-900 p-4 flex justify-between items-center text-white sticky top-0 z-[6000] shadow-xl">
         <h2 className="font-black uppercase tracking-tighter italic">
           AdminHub
         </h2>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 bg-slate-800 rounded-lg"
+          className="p-2 bg-slate-800 rounded-lg active:scale-95 transition-transform"
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Sidebar */}
+      {/* BACKDROP: Only shows on Mobile/Tablet when sidebar is open */}
       <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[7000] lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      {/* <AnimatePresence>
         {(sidebarOpen || window.innerWidth >= 1024) && (
           <motion.aside
             initial={{ x: -300 }}
@@ -308,9 +333,75 @@ export default function AdminDashboard() {
             </div>
           </motion.aside>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+      {/* SIDEBAR */}
+      <aside
+        className={`
+        fixed inset-y-0 left-0 z-[8000] w-72 bg-slate-900 text-white p-6 flex flex-col transition-transform duration-300 ease-in-out
+        lg:translate-x-0 lg:static lg:h-screen lg:z-auto
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+      >
+        <div className="flex justify-between items-center mb-10">
+          <h2 className="text-xl font-black uppercase px-2 tracking-widest italic">
+            Admin<span className="text-blue-500">Hub</span>
+          </h2>
+          {/* Close button inside sidebar for tablet/mobile */}
+          <button
+            className="lg:hidden p-2 hover:bg-slate-800 rounded-full"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <nav className="space-y-2 flex-1">
+          <SideBtn
+            active={activeTab === "overview"}
+            icon={<BarChart3 size={20} />}
+            label={t`Analytics`}
+            onClick={() => {
+              setActiveTab("overview");
+              setSidebarOpen(false);
+            }}
+          />
+          <SideBtn
+            active={activeTab === "add"}
+            icon={<Plus size={20} />}
+            label={t`Add Property`}
+            onClick={() => {
+              setActiveTab("add");
+              setSidebarOpen(false);
+            }}
+          />
+          <SideBtn
+            active={activeTab === "manage"}
+            icon={<LayoutGrid size={20} />}
+            label={t`Inventory`}
+            onClick={() => {
+              setActiveTab("manage");
+              setSidebarOpen(false);
+            }}
+          />
+          <SideBtn
+            active={activeTab === "visits"}
+            icon={<Calendar size={20} />}
+            label={t`Visits`}
+            onClick={() => {
+              setActiveTab("visits");
+              setSidebarOpen(false);
+            }}
+          />
+        </nav>
+
+        <div className="mt-auto flex items-center gap-2 text-[10px] text-emerald-400 font-bold">
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+          {t`Live Stats Connected`}
+        </div>
+      </aside>
+
+      <main className="flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto w-full">
         <div className="max-w-7xl mx-auto">
           {activeTab === "overview" && stats && (
             <div className="space-y-8">
