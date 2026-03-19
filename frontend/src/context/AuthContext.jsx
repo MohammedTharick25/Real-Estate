@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     async (userId) => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/users/status/${userId}`,
+          `${import.meta.env.VITE_API_URL}/api/users/status/${userId}`,
         );
         if (res.data.isBlocked) {
           logout();
