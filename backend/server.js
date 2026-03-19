@@ -73,6 +73,10 @@ app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/visits", require("./routes/visitRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 
+app.get("/health", (req, res) => {
+  res.status(200).send("Server is awake");
+});
+
 // Database Connection
 mongoose
   .connect(process.env.MONGO_URI)
