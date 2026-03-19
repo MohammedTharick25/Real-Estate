@@ -5,27 +5,25 @@ const Visit = require("../models/Visit");
 
 router.get("/stats", async (req, res) => {
   try {
-    // BASIC KPIs
     const totalListings = await Listing.countDocuments();
     const totalVisits = await Visit.countDocuments();
-
     const viewsAgg = await Listing.aggregate([
       { $group: { _id: null, totalViews: { $sum: "$views" } } },
     ]);
-
     const totalViews = viewsAgg[0]?.totalViews || 0;
 
-    // INVENTORY VALUE (Available vs Sold)
-    const inventoryValue = await Listing.aggregate([
+    // Fixed Inventory Value Aggregation to ensure we always have "Sold" and "Available" labels
+    const inventoryData = await Listing.aggregate([
       {
         $group: {
           _id: "$status",
           total: { $sum: "$price" },
+          count: { $sum: 1 },
         },
       },
     ]);
 
-    // MONTHLY VISIT TRENDS
+    // Monthly Visit Trends (Existing logic is good)
     const months = [
       "Jan",
       "Feb",
@@ -40,83 +38,62 @@ router.get("/stats", async (req, res) => {
       "Nov",
       "Dec",
     ];
-
     const visitData = await Visit.aggregate([
-      {
-        $group: {
-          _id: { $month: "$createdAt" },
-          count: { $sum: 1 },
-        },
-      },
+      { $group: { _id: { $month: "$createdAt" }, count: { $sum: 1 } } },
     ]);
-
     const visitMap = {};
     visitData.forEach((v) => {
       visitMap[v._id] = v.count;
     });
-
     const visitTrends = months.map((m, i) => ({
       _id: m,
       count: visitMap[i + 1] || 0,
     }));
 
-    // TOP PERFORMING PROPERTIES
     const topProperties = await Listing.find()
       .sort({ views: -1 })
       .limit(6)
-      .select("title views price");
+      .select("title views price status");
 
-    // CONVERSION RATE
-    const conversionRate =
-      totalViews > 0 ? ((totalVisits / totalViews) * 100).toFixed(2) : 0;
-
-    // SOLD VALUE + COMMISSION REVENUE
+    // KPI Calculations
     const soldListings = await Listing.find({ status: "Sold" });
-
     let soldValue = 0;
     let revenue = 0;
-
     soldListings.forEach((p) => {
       soldValue += p.price || 0;
       revenue += (p.price * (p.commission || 0)) / 100;
     });
 
-    // 5. Customer Satisfaction (Avg Rating)
     const ratings = await Visit.aggregate([
-      {
-        // Only look for visits where a rating was actually submitted
-        $match: { "feedback.rating": { $exists: true, $ne: null } },
-      },
+      { $match: { "feedback.rating": { $exists: true, $ne: null } } },
       {
         $group: {
           _id: null,
           avgRating: { $avg: "$feedback.rating" },
-          totalReviews: { $sum: 1 }, // Also count how many people rated
+          totalReviews: { $sum: 1 },
         },
       },
     ]);
-
-    const avgRating = ratings.length > 0 ? ratings[0].avgRating : 0;
-    const reviewCount = ratings.length > 0 ? ratings[0].totalReviews : 0;
 
     res.json({
       kpis: {
         totalListings,
         totalVisits,
         totalViews,
-        conversionRate,
+        conversionRate:
+          totalViews > 0 ? ((totalVisits / totalViews) * 100).toFixed(2) : 0,
         soldValue,
         revenue,
-        avgRating: parseFloat(avgRating.toFixed(1)), // Ensure it's a clean number
-        reviewCount: reviewCount,
+        avgRating: ratings[0]?.avgRating
+          ? parseFloat(ratings[0].avgRating.toFixed(1))
+          : 0,
+        reviewCount: ratings[0]?.totalReviews || 0,
       },
-      inventoryValue,
+      inventoryValue: inventoryData, // Array of {_id: "Sold"/"Available", total: 1000}
       visitTrends,
       topProperties,
-      avgRating: 4.5,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

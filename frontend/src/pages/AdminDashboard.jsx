@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 import { Toaster, toast } from "react-hot-toast";
 
 import {
@@ -21,6 +23,9 @@ import {
   Phone,
   Video,
   Building2,
+  FileDown,
+  FileText,
+  PieChart as PieIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { t } from "@lingui/macro";
@@ -50,6 +55,7 @@ import {
   Cell,
   Legend,
 } from "recharts";
+import autoTable from "jspdf-autotable";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -162,6 +168,24 @@ export default function AdminDashboard() {
     a.click();
   };
 
+  const exportStatsCSV = () => {
+    const data = [
+      ["Metric", "Value"],
+      ["Sold Value", stats.kpis.soldValue],
+      ["Revenue", stats.kpis.revenue],
+      ["Total Views", stats.kpis.totalViews],
+      ["Rating", stats.kpis.avgRating],
+    ];
+    const csvContent =
+      "data:text/csv;charset=utf-8," + data.map((e) => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "business_stats.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
   const handleDeleteUser = async (userId) => {
     const result = await Swal.fire({
       title: t`Delete User?`,
@@ -177,6 +201,104 @@ export default function AdminDashboard() {
       fetchUsers();
       Swal.fire("Deleted!", "User removed.", "success");
     }
+  };
+
+  const exportFullReportPDF = () => {
+    if (!stats) return toast.error("No data available to export");
+
+    const doc = new jsPDF();
+    const timestamp = new Date().toLocaleString();
+
+    // 1. HEADER LOGO/TEXT
+    doc.setFillColor(37, 99, 235); // Blue-600
+    doc.rect(0, 0, 210, 40, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont("helvetica", "bold");
+    doc.text("ESTATERA ADMIN HUB", 15, 25);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("OFFICIAL BUSINESS INTELLIGENCE REPORT", 15, 33);
+
+    // 2. GENERATION DETAILS
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Report ID: EST-${Math.floor(Math.random() * 100000)}`, 140, 50);
+    doc.text(`Generated: ${timestamp}`, 140, 55);
+
+    // 3. KPI TABLE (The Fix: autoTable(doc, ...))
+    autoTable(doc, {
+      startY: 65,
+      head: [["Key Performance Indicator", "Current Value", "Status"]],
+      body: [
+        [
+          "Total Sold Value",
+          `INR ${stats.kpis.soldValue.toLocaleString()}`,
+          "Verified",
+        ],
+        [
+          "Total Commission Revenue",
+          `INR ${stats.kpis.revenue.toLocaleString()}`,
+          "Calculated",
+        ],
+        ["Active Inventory Count", stats.kpis.totalListings.toString(), "Live"],
+        [
+          "Overall Conversion Rate",
+          `${stats.kpis.conversionRate}%`,
+          "Views to Visits",
+        ],
+        [
+          "Average User Rating",
+          `${stats.kpis.avgRating}/5`,
+          `${stats.kpis.reviewCount} Reviews`,
+        ],
+      ],
+      headStyles: { fillStyle: [37, 99, 235], fontSize: 11 },
+      alternateRowStyles: { fillColor: [245, 247, 250] },
+      margin: { left: 15, right: 15 },
+    });
+
+    // 4. TOP PROPERTIES TABLE
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text(
+      "High-Performance Assets (Most Viewed)",
+      15,
+      doc.lastAutoTable.finalY + 15,
+    );
+
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 20,
+      head: [["Rank", "Property Title", "Market Price", "Engagement (Views)"]],
+      body: stats.topProperties.map((p, i) => [
+        `#${i + 1}`,
+        p.title,
+        `INR ${p.price.toLocaleString()}`,
+        `${p.views} Views`,
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: [51, 65, 85] }, // Slate-700
+    });
+
+    // 5. FOOTER
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(
+        `Confidential - Estatera Realty Group - Page ${i} of ${pageCount}`,
+        105,
+        290,
+        { align: "center" },
+      );
+    }
+
+    doc.save(
+      `Estatera_Intelligence_Report_${new Date().toISOString().slice(0, 10)}.pdf`,
+    );
+    toast.success("Intelligence report generated successfully!");
   };
 
   const updateVisitStatus = async (id, status) => {
@@ -484,6 +606,32 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto">
           {activeTab === "overview" && stats && (
             <div className="space-y-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h2 className="text-3xl font-black tracking-tight dark:text-white italic">
+                    Business <span className="text-blue-600">Insights</span>
+                  </h2>
+                  <p className="text-slate-500 text-sm">
+                    Real-time performance analytics and property tracking.
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={exportStatsCSV}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-2xl text-sm font-bold hover:shadow-lg transition-all"
+                  >
+                    <FileText size={18} className="text-blue-600" />
+                    CSV
+                  </button>
+                  <button
+                    onClick={exportFullReportPDF}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all"
+                  >
+                    <FileDown size={18} />
+                    Full Report (PDF)
+                  </button>
+                </div>
+              </div>
               {/* KPI Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <KPICard
@@ -547,37 +695,82 @@ export default function AdminDashboard() {
               {/* Charts Section */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Area Chart: Monthly Inquiries */}
-                <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-3xl border dark:border-slate-800 shadow-sm">
-                  <h3 className="font-bold text-lg mb-6 flex items-center gap-2 tracking-tight">
-                    <TrendingUp size={18} className="text-blue-500" />{" "}
-                    {t`Monthly Visit Requests`}
-                  </h3>
-                  <div className="h-64">
+                <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border dark:border-slate-800 shadow-sm relative overflow-hidden">
+                  <div className="flex justify-between items-center mb-8">
+                    <h3 className="font-bold text-lg flex items-center gap-2 italic">
+                      <TrendingUp size={20} className="text-blue-500" /> Monthly
+                      Growth
+                    </h3>
+                    <span className="text-[10px] font-black bg-blue-50 dark:bg-blue-900/30 text-blue-600 px-3 py-1 rounded-full uppercase tracking-tighter">
+                      Visit Inquiries
+                    </span>
+                  </div>
+                  <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={stats.visitTrends}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-
-                        <XAxis dataKey="_id" tick={{ fontSize: 12 }} />
-
-                        <YAxis tick={{ fontSize: 12 }} />
-
-                        <Tooltip formatter={(v) => [v, "Requests"]} />
-
+                        <defs>
+                          <linearGradient
+                            id="colorCount"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor="#3b82f6"
+                              stopOpacity={0.3}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor="#3b82f6"
+                              stopOpacity={0}
+                            />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          vertical={false}
+                          stroke="#f1f5f9"
+                        />
+                        <XAxis
+                          dataKey="_id"
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fontSize: 12, fontWeight: "bold" }}
+                          dy={10}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            borderRadius: "20px",
+                            border: "none",
+                            boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                          }}
+                        />
                         <Area
                           type="monotone"
                           dataKey="count"
                           stroke="#3b82f6"
-                          fill="#3b82f610"
-                          strokeWidth={3}
+                          strokeWidth={4}
+                          fillOpacity={1}
+                          fill="url(#colorCount)"
                         />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
-                {/* Pie Chart: Inventory */}
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border dark:border-slate-800 shadow-sm">
-                  <h3 className="font-bold text-lg mb-6">{t`Value Share (₹)`}</h3>
+                {/* 🥧 INVENTORY VALUE (ENHANCED) */}
+                <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border dark:border-slate-800 shadow-sm">
+                  <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                    <PieIcon size={20} className="text-emerald-500" /> Asset
+                    Value
+                  </h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -587,19 +780,38 @@ export default function AdminDashboard() {
                           nameKey="_id"
                           cx="50%"
                           cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={0}
-                          stroke="none"
+                          innerRadius={70}
+                          outerRadius={90}
+                          paddingAngle={8}
                         >
                           {stats.inventoryValue?.map((e, i) => (
-                            <Cell key={i} fill={CHART_COLORS[i % 4]} />
+                            <Cell
+                              key={i}
+                              fill={e._id === "Sold" ? "#ef4444" : "#10b981"}
+                            />
                           ))}
                         </Pie>
                         <Tooltip formatter={(v) => `₹${v.toLocaleString()}`} />
-                        <Legend iconType="circle" />
                       </PieChart>
                     </ResponsiveContainer>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    {stats.inventoryValue.map((item, i) => (
+                      <div
+                        key={i}
+                        className="flex justify-between items-center text-sm font-bold"
+                      >
+                        <span className="flex items-center gap-2">
+                          <div
+                            className={`w-3 h-3 rounded-full ${item._id === "Sold" ? "bg-red-500" : "bg-emerald-500"}`}
+                          />
+                          {item._id}
+                        </span>
+                        <span className="dark:text-white">
+                          ₹{item.total.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -967,7 +1179,10 @@ export default function AdminDashboard() {
                       onChange={(e) => setUserSearch(e.target.value)}
                     />
                   </div>
-                  <button className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl hover:bg-blue-50 transition-colors">
+                  <button
+                    className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl hover:bg-blue-50 transition-colors"
+                    onClick={exportUsersToCSV}
+                  >
                     <Download
                       size={20}
                       className="text-slate-600 dark:text-slate-400"
