@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   MapPin,
   Ruler,
@@ -12,6 +14,8 @@ import {
   ShieldCheck,
   Calculator,
   Phone,
+  FileText,
+  Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
@@ -129,6 +133,133 @@ export default function PropertyDetails() {
     ...(property.images || []),
   ];
 
+  // Helper to convert image URL to Base64 (Essential for jsPDF)
+  const getBase64ImageFromURL = (url) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.setAttribute("crossOrigin", "anonymous");
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+        resolve(dataURL);
+      };
+      img.onerror = (error) => reject(error);
+      img.src = url;
+    });
+  };
+
+  const downloadBrochure = async () => {
+    const toastId = toast.loading(t`Generating high-quality brochure...`);
+    try {
+      const doc = new jsPDF();
+      const brandColor = [37, 99, 235]; // #2563eb
+
+      // --- 1. HEADER & BRANDING ---
+      doc.setFillColor(...brandColor);
+      doc.rect(0, 0, 210, 40, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(22);
+      doc.setFont("helvetica", "bold");
+      doc.text("ESTATERA", 15, 25);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text("PREMIUM REAL ESTATE BROCHURE", 15, 33);
+      doc.text(new Date().toLocaleDateString(), 180, 25, { align: "right" });
+
+      // --- 2. MAIN IMAGE ---
+      if (property.images?.[0]) {
+        try {
+          const imgData = await getBase64ImageFromURL(property.images[0]);
+          // Aspect ratio calculation to fit width
+          const imgWidth = 180;
+          const imgHeight = 100;
+          doc.addImage(
+            imgData,
+            "PNG",
+            15,
+            50,
+            imgWidth,
+            imgHeight,
+            undefined,
+            "FAST",
+          );
+        } catch (e) {
+          console.error("Image PDF error", e);
+        }
+      }
+
+      // --- 3. PROPERTY TITLE & PRICE ---
+      doc.setTextColor(30, 41, 59);
+      doc.setFontSize(20);
+      doc.setFont("helvetica", "bold");
+      doc.text(property.title, 15, 165);
+
+      doc.setTextColor(...brandColor);
+      doc.setFontSize(18);
+      doc.text(`INR ${property.price.toLocaleString()}`, 15, 175);
+
+      // --- 4. KEY DETAILS TABLE ---
+      autoTable(doc, {
+        startY: 185,
+        head: [[t`Location`, t`Property Type`, t`Size`]],
+        body: [[property.location, property.propertyType, property.size]],
+        theme: "plain",
+        headStyles: {
+          textColor: [100, 100, 100],
+          fontSize: 9,
+          fontStyle: "bold",
+        },
+        bodyStyles: { fontSize: 11, textColor: [0, 0, 0], fontStyle: "bold" },
+        margin: { left: 15 },
+      });
+
+      // --- 5. DESCRIPTION ---
+      doc.setTextColor(100, 100, 100);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text(t`DESCRIPTION`, 15, doc.lastAutoTable.finalY + 10);
+
+      doc.setTextColor(50, 50, 50);
+      doc.setFont("helvetica", "normal");
+      const splitDesc = doc.splitTextToSize(property.description, 180);
+      doc.text(splitDesc, 15, doc.lastAutoTable.finalY + 17);
+
+      // --- 6. AMENITIES ---
+      if (property.amenities?.length > 0) {
+        const yPos = doc.lastAutoTable.finalY + 50;
+        doc.setTextColor(100, 100, 100);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(t`\n\nPREMIUM AMENITIES\n`, 15, yPos);
+
+        doc.setTextColor(...brandColor);
+        doc.text(t`\n\n${property.amenities.join("  •  ")}\n`, 15, yPos + 7);
+      }
+
+      // --- 7. FOOTER ---
+      doc.setDrawColor(230, 230, 230);
+      doc.line(15, 275, 195, 275);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        t`Contact us at support@estatera@gmail.com for more information regarding this property.`,
+        105,
+        282,
+        { align: "center" },
+      );
+
+      doc.save(`${property.title.replace(/\s+/g, "_")}_Brochure.pdf`);
+      toast.success(t`Brochure downloaded!`, { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error(t`Failed to generate PDF`, { id: toastId });
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -184,6 +315,14 @@ export default function PropertyDetails() {
           <ArrowLeft size={20} /> {t`Back`}
         </button>
         <div className="flex gap-2">
+          <button
+            onClick={downloadBrochure}
+            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-white rounded-full shadow-md hover:bg-blue-50 dark:hover:bg-slate-700 transition-all font-bold text-sm"
+          >
+            <FileText size={18} className="text-blue-600" />
+            <span className="hidden md:inline">{t`Brochure`}</span>
+          </button>
+
           <button
             onClick={() =>
               navigator.share
@@ -360,9 +499,10 @@ export default function PropertyDetails() {
                   type="text"
                   value={user?.user?.email || ""}
                   readOnly
-                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl outline-none text-sm text-slate-500"
+                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl outline-none text-sm text-slate-500 cursor-not-allowed"
                 />
               </div>
+
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">{t`Mobile Number`}</label>
                 <input
@@ -371,13 +511,33 @@ export default function PropertyDetails() {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full p-4 bg-slate-100 dark:bg-slate-800 dark:text-white rounded-xl outline-none focus:ring-2 ring-blue-500/20"
+                  className="w-full p-4 bg-slate-100 dark:bg-slate-800 dark:text-white rounded-xl outline-none focus:ring-2 ring-blue-500/20 transition-all"
                 />
               </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:shadow-xl transition-all"
-              >{t`Request Visit`}</button>
+
+              <div className="pt-2 space-y-3">
+                {/* PRIMARY ACTION: Request Visit */}
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.98]"
+                >
+                  {t`Request Visit`}
+                </button>
+
+                {/* SECONDARY ACTION: Download Brochure */}
+                <button
+                  type="button" // 👈 Crucial: prevents the form from submitting
+                  onClick={downloadBrochure}
+                  className="w-full flex items-center justify-center gap-2 border-2 border-blue-600/10 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 py-4 rounded-2xl font-black hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-[0.98]"
+                >
+                  <FileText size={20} />
+                  {t`Download Brochure`}
+                </button>
+              </div>
+
+              <p className="text-[10px] text-center text-slate-400 font-medium px-4">
+                {t`By clicking, you agree to our terms of service and privacy policy.`}
+              </p>
             </form>
           </div>
         </div>
