@@ -43,7 +43,7 @@ export default function Navbar() {
   const navLinks = [
     { name: t`Home`, path: "/", icon: <Home size={20} /> },
     { name: t`Browse Properties`, path: "/listings", icon: <List size={20} /> },
-    { name: t`Call Us`, path: "/contact", icon: <Phone size={20} /> },
+    { name: t`Contact`, path: "/contact", icon: <Phone size={20} /> },
   ];
 
   const closeMenu = () => setIsMobileMenuOpen(false);

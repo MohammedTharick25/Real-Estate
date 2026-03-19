@@ -1,33 +1,67 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const http = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
-const userRoutes = require("./routes/userRoutes");
-
-const listingRoutes = require("./routes/listingRoutes");
 
 const app = express();
-const authRoutes = require("./routes/authRoutes");
+const server = http.createServer(app); // Create HTTP server
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // Your Frontend URL
+    methods: ["GET", "POST", "PATCH"],
+  },
+});
+
+// Store connected users for mapping IDs to Sockets
+const connectedUsers = {};
+
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on("join", ({ userId, role }) => {
+    // 1. Map user ID to socket ID
+    connectedUsers[userId] = socket.id;
+
+    // 2. Join a private room based on their User ID
+    socket.join(userId);
+    console.log(`User ${userId} joined room: ${userId}`);
+
+    // 3. If admin, join the global 'admins' room
+    if (role === "admin") {
+      socket.join("admins");
+      console.log(`Admin ${userId} joined admins room`);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    // Remove from connectedUsers mapping
+    for (const userId in connectedUsers) {
+      if (connectedUsers[userId] === socket.id) {
+        delete connectedUsers[userId];
+        break;
+      }
+    }
+    console.log("User disconnected");
+  });
+});
+
+// Make io and connectedUsers global to the app
+app.set("io", io);
+app.set("connectedUsers", connectedUsers);
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api/listings", listingRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-
-app.post("/api/inquiry", async (req, res) => {
-  try {
-    const Inquiry = require("./models/Inquiry");
-    const newInquiry = new Inquiry(req.body);
-    await newInquiry.save();
-    res.status(200).json({ message: "Inquiry sent successfully!" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+app.use("/api/listings", require("./routes/listingRoutes"));
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/visits", require("./routes/visitRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
 
 // Database Connection
 mongoose
@@ -35,5 +69,6 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ DB Connection Error:", err));
 
+// IMPORTANT: Listen on 'server', NOT 'app'
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
