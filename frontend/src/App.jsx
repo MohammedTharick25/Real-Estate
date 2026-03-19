@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
@@ -12,6 +13,9 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import { useEffect } from "react";
+import { useAuth } from "./context/AuthContext";
+import { t } from "@lingui/macro";
 
 import { I18nProvider } from "@lingui/react";
 import { i18n } from "@lingui/core";
@@ -19,17 +23,92 @@ import { messages as enMessages } from "./locales/en/messages.po";
 import { messages as taMessages } from "./locales/ta/messages.po";
 import { messages as hiMessages } from "./locales/hi/messages.po";
 
+import { io } from "socket.io-client";
+import { Toaster, toast } from "react-hot-toast";
+
 const savedLang = localStorage.getItem("lang") || "en";
 i18n.load("en", enMessages);
 i18n.load("ta", taMessages);
 i18n.load("hi", hiMessages);
 i18n.activate(savedLang);
 
+// Initialize Socket outside or in a useMemo to prevent multiple instances
+const socket = io("http://localhost:5000", {
+  autoConnect: true,
+});
+
 function App() {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user && user.user) {
+      // 1. Identity yourself to the backend
+      socket.emit("join", {
+        userId: user.user.id,
+        role: user.user.role,
+      });
+
+      // 2. Listen for User Notifications
+      socket.on("user_notification", (data) => {
+        toast.success(data.message, {
+          duration: 5000,
+          position: "top-right",
+          icon: "📅",
+          style: { borderRadius: "10px", background: "#333", color: "#fff" },
+        });
+      });
+
+      // 3. Listen for Admin Notifications
+      socket.on("admin_notification", (data) => {
+        toast(data.message, {
+          duration: 6000,
+          position: "top-right",
+          icon: "🔔",
+          style: {
+            border: "2px solid #2563eb",
+            padding: "16px",
+            fontWeight: "bold",
+          },
+        });
+      });
+    }
+
+    // Cleanup listeners on logout or unmount
+    return () => {
+      socket.off("user_notification");
+      socket.off("admin_notification");
+    };
+  }, [user]);
+
   return (
-    <AuthProvider>
+    <>
       <I18nProvider i18n={i18n}>
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          gutter={8}
+          toastOptions={{
+            // Global styles for all toasts
+            duration: 5000,
+            style: {
+              background: "#1e293b", // Slate 800
+              color: "#fff",
+              borderRadius: "20px",
+              padding: "12px 24px",
+              fontSize: "14px",
+              fontWeight: "bold",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)",
+            },
+            success: {
+              iconTheme: { primary: "#10b981", secondary: "#fff" },
+            },
+            error: {
+              iconTheme: { primary: "#ef4444", secondary: "#fff" },
+            },
+          }}
+        />
         <Router>
+          <ScrollToTop />
           <Navbar />
           <div className="min-h-screen bg-slate-50 flex flex-col">
             <main className="flex-grow">
@@ -57,7 +136,7 @@ function App() {
           </div>
         </Router>
       </I18nProvider>
-    </AuthProvider>
+    </>
   );
 }
 
