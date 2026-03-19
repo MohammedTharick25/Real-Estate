@@ -8,9 +8,14 @@ require("dotenv").config();
 const app = express();
 const server = http.createServer(app); // Create HTTP server
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://estatera.onrender.com", // You will get this from Render later
+];
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Your Frontend URL
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PATCH"],
   },
 });
@@ -53,7 +58,12 @@ app.set("io", io);
 app.set("connectedUsers", connectedUsers);
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 // Routes

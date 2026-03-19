@@ -89,7 +89,9 @@ export default function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/users/all");
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/users/all`,
+      );
       setUsers(res.data);
     } catch (err) {
       console.error("User fetch error", err);
@@ -99,7 +101,9 @@ export default function AdminDashboard() {
   // FETCH FUNCTIONS
   const fetchStats = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/stats");
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/admin/stats`,
+      );
       console.log("Full Stats from Server:", res.data);
       setStats(res.data);
     } catch (err) {
@@ -108,12 +112,14 @@ export default function AdminDashboard() {
   };
 
   const fetchListings = async () => {
-    const res = await axios.get("http://localhost:5000/api/listings");
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/listings`);
     setListings(res.data);
   };
 
   const fetchVisits = async () => {
-    const res = await axios.get("http://localhost:5000/api/visits/admin");
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/visits/admin`,
+    );
     setVisits(res.data);
   };
 
@@ -134,9 +140,12 @@ export default function AdminDashboard() {
   // HANDLERS
   const toggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === "Available" ? "Sold" : "Available";
-    await axios.patch(`http://localhost:5000/api/listings/${id}/status`, {
-      status: newStatus,
-    });
+    await axios.patch(
+      `${import.meta.env.VITE_API_URL}/api/listings/${id}/status`,
+      {
+        status: newStatus,
+      },
+    );
     toast.success(t`Status updated to ${newStatus}`);
     await fetchListings();
     await fetchStats();
@@ -145,7 +154,7 @@ export default function AdminDashboard() {
   const handleToggleBlock = async (userId) => {
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api/users/${userId}/block`,
+        `${import.meta.env.VITE_API_URL}/api/users/${userId}/block`,
       );
       toast.success(res.data.message);
       fetchUsers();
@@ -197,7 +206,7 @@ export default function AdminDashboard() {
     });
 
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/api/users/${userId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/${userId}`);
       fetchUsers();
       Swal.fire("Deleted!", "User removed.", "success");
     }
@@ -305,7 +314,7 @@ export default function AdminDashboard() {
     try {
       // We use toast.promise to handle the loading state and the final message from backend
       await toast.promise(
-        axios.patch(`http://localhost:5000/api/visits/${id}/status`, {
+        axios.patch(`${import.meta.env.VITE_API_URL}/api/visits/${id}/status`, {
           status,
         }),
         {
@@ -340,7 +349,7 @@ export default function AdminDashboard() {
     });
 
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/api/listings/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/listings/${id}`);
       await fetchListings();
       await fetchStats();
 
@@ -417,7 +426,7 @@ export default function AdminDashboard() {
     Array.from(videos).forEach((vid) => data.append("videos", vid));
 
     toast.promise(
-      axios.post("http://localhost:5000/api/listings", data),
+      axios.post(`${import.meta.env.VITE_API_URL}/api/listings`, data),
       {
         loading: t`Uploading property and media...`,
         success: () => {

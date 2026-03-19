@@ -88,7 +88,7 @@ export default function Listings() {
         params.append("radius", f.radius);
       }
       const res = await axios.get(
-        `http://localhost:5000/api/listings?${params.toString()}`,
+        `${import.meta.env.VITE_API_URL}/api/listings?${params.toString()}`,
       );
       setProperties(res.data);
     } catch (err) {

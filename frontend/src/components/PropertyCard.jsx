@@ -17,7 +17,7 @@ export default function PropertyCard({ property }) {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/users/favorites/toggle",
+        `${import.meta.env.VITE_API_URL}/api/users/favorites/toggle`,
         {
           userId: user.user.id,
           propertyId: property._id,
