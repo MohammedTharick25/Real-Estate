@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="/favicon.png" sizes="16x16" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="manifest" href="/manifest.json" />
 
     <meta
       name="viewport"
@@ -61,6 +61,19 @@
       content="https://estatera.onrender.com/og-image.png"
     />
 
+    <!-- WHATSAPP FIX: Must be an absolute URL, under 300KB, and preferably a .jpg -->
+    <meta
+      property="og:image"
+      content="https://estatera.onrender.com/og-whatsapp.png"
+    />
+    <meta
+      property="og:image:secure_url"
+      content="https://estatera.onrender.com/og-whatsapp.png"
+    />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
     <!-- 5. PERFORMANCE: PRECONNECT TO EXTERNAL SOURCES -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -84,5 +97,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js");
+        });
+      }
+    </script>
   </body>
 </html>
