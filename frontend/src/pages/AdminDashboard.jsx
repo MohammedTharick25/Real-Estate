@@ -327,7 +327,7 @@ export default function AdminDashboard() {
     0;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 flex flex-col lg:flex-row transition-all">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 flex flex-col lg:flex-row transition-all items-stretch">
       {/* Mobile and Tablet Top Bar */}
       <div className="lg:hidden bg-slate-900 p-4 flex justify-between items-center text-white sticky top-0 z-[6000] shadow-xl">
         <h2 className="font-black uppercase tracking-tighter italic">
@@ -408,10 +408,10 @@ export default function AdminDashboard() {
       {/* SIDEBAR */}
       <aside
         className={`
-        fixed inset-y-0 left-0 z-[8000] w-72 bg-slate-900 text-white p-6 flex flex-col transition-transform duration-300 ease-in-out
-        lg:translate-x-0 lg:static lg:h-screen lg:z-auto
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-      `}
+    fixed inset-y-0 left-0 z-[8000] w-72 bg-slate-900 text-white p-6 flex flex-col transition-transform duration-300 ease-in-out
+    lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:z-auto lg:flex-shrink-0
+    ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+  `}
       >
         <div className="flex justify-between items-center mb-10">
           <h2 className="text-xl font-black uppercase px-2 tracking-widest italic">
