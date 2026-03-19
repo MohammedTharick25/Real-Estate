@@ -2,71 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- 1. HIGH-END ICON SYSTEM -->
-    <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="/favicon.png" sizes="16x16" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
+    <!-- 1. ICONS & MANIFEST -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
     <link rel="manifest" href="/manifest.json" />
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 2. GOOGLE CONSOLE VERIFICATION (REPLACE WITH YOUR NEW CODE) -->
     <meta
       name="google-site-verification"
       content="uKrQbKBKxg0B17541hevtEsdt3IDGoPxMDJJ3_-Z2aU"
     />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
-    />
-
-    <!-- 2. PRIMARY SEO METADATA -->
     <title>Estatera — Luxury Living Redefined | Verified Real Estate</title>
     <meta
-      name="title"
-      content="Estatera — Luxury Living Redefined | Verified Real Estate"
-    />
-    <meta
       name="description"
-      content="Discover verified premium lands and architecturally stunning homes designed for your future. The most trusted platform for high-end real estate."
+      content="Discover verified premium lands and architecturally stunning homes designed for your future."
     />
-    <meta
-      name="keywords"
-      content="real estate, luxury homes, verified land, buy property, Estatera, premium housing"
-    />
-    <meta name="author" content="Estatera Group" />
     <meta name="theme-color" content="#2563eb" />
-    <!-- Estatera Blue -->
 
-    <!-- 3. OPEN GRAPH / FACEBOOK / WHATSAPP -->
+    <!-- 3. SCHEMA.ORG / ITEMPROP (Specifically for Google Search Results) -->
+    <meta itemprop="name" content="Estatera — Luxury Living Redefined" />
+    <meta
+      itemprop="description"
+      content="The most trusted platform for high-end real estate and verified land."
+    />
+    <!-- Use the absolute URL for the thumbnail image -->
+    <meta
+      itemprop="image"
+      content="https://estatera.onrender.com/og-image.png"
+    />
+
+    <!-- 4. OPEN GRAPH (Social Media) -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://estatera.onrender.com/" />
     <meta property="og:title" content="Estatera — Luxury Living Redefined" />
     <meta
       property="og:description"
-      content="Browse verified premium properties with professional AI-driven insights and 3D tours."
+      content="Browse verified premium properties with professional insights."
     />
-    <!-- IMPORTANT: Use an absolute URL for the image -->
     <meta
       property="og:image"
-      content="https://estatera.onrender.com/og-image.png"
+      content="https://estatera.onrender.com/og-whatsapp.png"
     />
 
-    <!-- 4. TWITTER -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://estatera.onrender.com/" />
-    <meta
-      property="twitter:title"
-      content="Estatera — Luxury Living Redefined"
-    />
-    <meta
-      property="twitter:description"
-      content="Browse verified premium properties with professional AI-driven insights and 3D tours."
-    />
-    <meta
-      property="twitter:image"
-      content="https://estatera.onrender.com/og-image.png"
-    />
-
-    <!-- WHATSAPP FIX: Must be an absolute URL, under 300KB, and preferably a .jpg -->
     <meta
       property="og:image"
       content="https://estatera.onrender.com/og-whatsapp.png"
@@ -79,19 +59,35 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
-    <!-- 5. PERFORMANCE: PRECONNECT TO EXTERNAL SOURCES -->
+    <!-- 5. JSON-LD STRUCTURED DATA (The "Secret" for World Class Search Results) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "RealEstateAgent",
+        "name": "Estatera",
+        "image": "https://estatera.onrender.com/og-image.png",
+        "@id": "https://estatera.onrender.com",
+        "url": "https://estatera.onrender.com",
+        "telephone": "+919876543210",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Downtown",
+          "addressLocality": "Chennai",
+          "postalCode": "600001",
+          "addressCountry": "IN"
+        }
+      }
+    </script>
+
+    <!-- 6. FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://res.cloudinary.com" />
-
-    <!-- WORLD CLASS FONT: Inter or Manrope -->
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap"
       rel="stylesheet"
     />
 
     <style>
-      /* Prevent 'flash of unstyled content' */
       body {
         font-family: "Manrope", sans-serif;
         margin: 0;
