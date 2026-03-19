@@ -33,7 +33,7 @@ i18n.load("hi", hiMessages);
 i18n.activate(savedLang);
 
 // Initialize Socket outside or in a useMemo to prevent multiple instances
-const socket = io("http://localhost:5000", {
+const socket = io(`${import.meta.env.VITE_API_URL}`, {
   autoConnect: true,
 });
 

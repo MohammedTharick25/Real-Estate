@@ -59,7 +59,7 @@ export default function Profile() {
   const fetchMyVisits = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/visits/user/${user.user.id}`,
+        `${import.meta.env.VITE_API_URL}/api/visits/user/${user.user.id}`,
       );
       setMyVisits(res.data);
     } catch (err) {
@@ -70,7 +70,7 @@ export default function Profile() {
   const fetchFavorites = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/users/favorites/${user.user.id}`,
+        `${import.meta.env.VITE_API_URL}/api/users/favorites/${user.user.id}`,
       );
       setFavorites(res.data);
     } catch (err) {
@@ -81,7 +81,7 @@ export default function Profile() {
   const submitFeedback = async (visitId) => {
     try {
       await axios.patch(
-        `http://localhost:5000/api/visits/${visitId}/feedback`,
+        `${import.meta.env.VITE_API_URL}/api/visits/${visitId}/feedback`,
         feedbackData,
       );
       toast.success(t`Message sent successfully!`);
@@ -110,7 +110,7 @@ export default function Profile() {
     setLoading(true);
     try {
       const res = await axios.put(
-        "http://localhost:5000/api/users/update",
+        `${import.meta.env.VITE_API_URL}/api/users/update`,
         data,
       );
       login(res.data);

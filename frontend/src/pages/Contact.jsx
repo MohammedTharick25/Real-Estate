@@ -2,6 +2,7 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { useRef } from "react";
 import { t } from "@lingui/macro";
+import { toast } from "react-hot-toast";
 
 export default function Contact() {
   const form = useRef();
@@ -18,11 +19,11 @@ export default function Contact() {
       )
       .then(
         () => {
-          alert(t`Message sent successfully!`);
+          toast.success(t`Message sent successfully!`);
           form.current.reset();
         },
         (error) => {
-          alert(t`Failed to send message`);
+          toast.error(t`Failed to send message`);
           console.error(error);
         },
       );

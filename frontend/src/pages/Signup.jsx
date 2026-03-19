@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { t } from "@lingui/macro";
+import { toast } from "react-hot-toast";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -24,13 +25,16 @@ export default function Signup() {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/auth/signup", formData);
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/signup`,
+        formData,
+      );
 
-      alert(t`Account created! Please login.`);
+      toast.success(t`Account created! Please login.`);
       navigate("/login");
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || t`Registration failed`);
+      toast.error(err.response?.data?.error || t`Registration failed`);
     } finally {
       setLoading(false);
     }

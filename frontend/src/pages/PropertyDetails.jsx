@@ -42,7 +42,7 @@ export default function PropertyDetails() {
   useEffect(() => {
     // Fetch Property Data
     axios
-      .get(`http://localhost:5000/api/listings/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/api/listings/${id}`)
       .then((res) => {
         setProperty(res.data);
         setLoanAmount(res.data.price);
@@ -58,7 +58,7 @@ export default function PropertyDetails() {
       const sessionKey = `v_${id}`;
       if (!sessionStorage.getItem(sessionKey)) {
         axios
-          .patch(`http://localhost:5000/api/listings/${id}/view`)
+          .patch(`${import.meta.env.VITE_API_URL}/api/listings/${id}/view`)
           .then(() => sessionStorage.setItem(sessionKey, "true"))
           .catch((err) => console.error("Analytics Error:", err));
       }
@@ -72,7 +72,7 @@ export default function PropertyDetails() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/users/favorites/toggle",
+        `${import.meta.env.VITE_API_URL}/api/users/favorites/toggle`,
         {
           userId: user.user?.id,
           propertyId: property?._id,
@@ -106,7 +106,7 @@ export default function PropertyDetails() {
     if (!phone) return toast.error(t`Please enter your mobile number.`);
 
     try {
-      await axios.post("http://localhost:5000/api/visits", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/visits`, {
         propertyId: id,
         userId: user.user.id,
         name: user.user.name,

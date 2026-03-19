@@ -19,7 +19,7 @@ export default function Home() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/listings")
+      .get(`${import.meta.env.VITE_API_URL}/api/listings`)
       .then((res) => setProperties(res.data.slice(0, 3)))
       .catch((err) => console.error(err));
   }, []);
