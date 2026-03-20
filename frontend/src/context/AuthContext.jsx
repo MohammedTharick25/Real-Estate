@@ -42,20 +42,33 @@ export const AuthProvider = ({ children }) => {
     [logout],
   );
 
+  // AuthContext.jsx
   useEffect(() => {
     const initAuth = async () => {
-      const savedUser = localStorage.getItem("userInfo");
-      if (savedUser) {
-        const parsed = JSON.parse(savedUser);
-        setUser(parsed);
+      try {
+        const savedUser = localStorage.getItem("userInfo");
+        if (savedUser) {
+          const parsed = JSON.parse(savedUser);
+          setUser(parsed);
 
-        // Extract ID correctly based on your object structure
-        const uid = parsed.user?._id || parsed.user?.id || parsed._id;
-        if (uid) {
-          await checkUserStatus(uid);
+          const uid = parsed.user?._id || parsed.user?.id || parsed._id;
+          if (uid) {
+            // Verify status but don't let it crash the app if the server is slow
+            await axios
+              .get(`${import.meta.env.VITE_API_URL}/api/users/status/${uid}`)
+              .then((res) => {
+                if (res.data.isBlocked) logout();
+              })
+              .catch(() =>
+                console.log("Server offline, staying logged in locally"),
+              );
+          }
         }
+      } catch (err) {
+        console.error("Auth initialization failed", err);
+      } finally {
+        setLoading(false); // 👈 THIS MUST RUN TO STOP THE BLANK SCREEN
       }
-      setLoading(false); // Set loading to false ONLY after checking storage
     };
 
     initAuth();

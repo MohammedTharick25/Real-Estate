@@ -32,6 +32,18 @@ function RecenterMap({ lat, lng }) {
 }
 
 export default function LocationPicker({ selectedLocation, onLocationSelect }) {
+  if (
+    !selectedLocation ||
+    selectedLocation.lat === undefined ||
+    selectedLocation.lng === undefined
+  ) {
+    return (
+      <div className="h-64 bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center text-slate-400">
+        Waiting for valid coordinates...
+      </div>
+    );
+  }
+
   function ClickHandler() {
     useMapEvents({
       click(e) {

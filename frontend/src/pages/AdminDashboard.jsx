@@ -431,7 +431,15 @@ export default function AdminDashboard() {
         loading: t`Uploading property and media...`,
         success: () => {
           setFormData({
-            /* reset logic */
+            title: "",
+            price: "",
+            location: "",
+            size: "",
+            propertyType: "Land",
+            description: "",
+            amenities: "",
+            latitude: 13.0827, // 👈 Default instead of undefined
+            longitude: 80.2707,
           });
           setImages([]);
           setVideos([]);
