@@ -5,7 +5,7 @@ const multer = require("multer");
 const { storage } = require("../config/cloudinary");
 const upload = multer({ storage });
 const Visit = require("../models/Visit"); // Import Visit model for cleanup on delete
-const { sendPropertyAlert } = require("../utils/mailer");
+const { sendPropertyAlert } = require("../utils/emailService"); // Import the email service function
 const User = require("../models/User");
 
 // CREATE Listing (Consolidated & Fixed)
