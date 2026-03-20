@@ -5,6 +5,8 @@ const multer = require("multer");
 const { storage } = require("../config/cloudinary");
 const upload = multer({ storage });
 const Visit = require("../models/Visit"); // Import Visit model for cleanup on delete
+const { sendPropertyAlert } = require("../utils/mailer");
+const User = require("../models/User");
 
 // CREATE Listing (Consolidated & Fixed)
 router.post(
@@ -38,8 +40,17 @@ router.post(
             : [],
       });
 
-      await newListing.save();
-      res.status(201).json(newListing);
+      const savedListing = await newListing.save();
+
+      // 🚀 WORLD CLASS FEATURE: Dispatch Emails in background
+      // We don't use 'await' here so the Admin doesn't have to wait for emails to send
+      User.find({ isBlocked: false }).then((users) => {
+        sendPropertyAlert(users, savedListing)
+          .then(() => console.log("✅ Property Alerts Sent"))
+          .catch((err) => console.error("❌ Mailer Error:", err));
+      });
+
+      res.status(201).json(savedListing);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
