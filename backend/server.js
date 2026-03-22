@@ -1,9 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
+require("dotenv").config();
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-require("dotenv").config();
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server

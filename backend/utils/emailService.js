@@ -2,8 +2,6 @@ const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  host: "smtp.gmail.com",
-  port: 465,
   secure: true,
   auth: {
     user: process.env.EMAIL_USER,
@@ -11,9 +9,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+console.log("Attempting Mailer Config for:", process.env.EMAIL_USER);
+
 const sendPropertyAlert = async (users, property) => {
   // Safety check: ensure we have users
   if (!users || users.length === 0) return console.log("No users to notify.");
+
+  const propertyImage =
+    property.images?.[0] || "https://estatera.onrender.com/og-image.png";
+  const propertyTitle = property.title || "Exclusive New Property";
+  const propertyPrice = property.price
+    ? `₹${property.price.toLocaleString()}`
+    : "Price on Request";
 
   const emailPromises = users.map((user) => {
     // 🛡️ Guard against missing data
@@ -50,5 +57,13 @@ const sendPropertyAlert = async (users, property) => {
 
   return Promise.allSettled(emailPromises);
 };
+
+transporter.verify((error) => {
+  if (error) {
+    console.log("❌ Mailer Config Failed:", error);
+  } else {
+    console.log("📧 Mailer Ready: SMTP connected");
+  }
+});
 
 module.exports = { sendPropertyAlert };
