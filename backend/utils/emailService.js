@@ -1,41 +1,39 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
   port: 587,
-  secure: false,
+  secure: false, // Use STARTTLS
+  pool: true, // 👈 Keep connection open for multiple emails
+  maxConnections: 3,
+  maxMessages: 100,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  // 🛡️ WORLD CLASS TIMEOUT SETTINGS
+  connectionTimeout: 20000, // 20 seconds
+  greetingTimeout: 20000,
+  socketTimeout: 20000,
   tls: {
-    rejectUnauthorized: false, // Helps bypass some cloud network handshake issues
+    rejectUnauthorized: false,
     minVersion: "TLSv1.2",
   },
 });
 
-console.log("Attempting Mailer Config for:", process.env.EMAIL_USER);
+console.log("⚡ Starting Mailer Service for:", process.env.EMAIL_USER);
 
 const sendPropertyAlert = async (users, property) => {
-  // Safety check: ensure we have users
   if (!users || users.length === 0) return console.log("No users to notify.");
 
   const propertyImage =
     property.images?.[0] || "https://estatera.onrender.com/og-image.png";
-  const propertyTitle = property.title || "Exclusive New Property";
+  const propertyTitle = property.title || "New Exclusive Property";
   const propertyPrice = property.price
     ? `₹${property.price.toLocaleString()}`
-    : "Price on Request";
+    : "Contact for Price";
 
   const emailPromises = users.map((user) => {
-    // 🛡️ Guard against missing data
-    const propertyImage =
-      property.images?.[0] || "https://estatera.onrender.com/og-image.png";
-    const propertyTitle = property.title || "New Luxury Property";
-    const propertyPrice = property.price
-      ? `₹${property.price.toLocaleString()}`
-      : "Contact for Price";
-
     return transporter.sendMail({
       from: `"Estatera Luxury" <${process.env.EMAIL_USER}>`,
       to: user.email,
@@ -63,11 +61,12 @@ const sendPropertyAlert = async (users, property) => {
   return Promise.allSettled(emailPromises);
 };
 
-transporter.verify((error) => {
+// Verify Connection with Error Handling
+transporter.verify((error, success) => {
   if (error) {
-    console.log("❌ Mailer Config Failed:", error);
+    console.log("❌ Mailer Config Failed (Timeout/Network):", error.message);
   } else {
-    console.log("📧 Mailer Ready: SMTP connected");
+    console.log("📧 Mailer Ready: SMTP connected on Port 587");
   }
 });
 
