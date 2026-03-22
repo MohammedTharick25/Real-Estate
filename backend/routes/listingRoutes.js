@@ -45,19 +45,10 @@ router.post(
       // 🚀 WORLD CLASS FEATURE: Dispatch Emails in background
       // We don't use 'await' here so the Admin doesn't have to wait for emails to send
       User.find({ isBlocked: false }).then((users) => {
-        console.log(`Attempting to send emails to ${users.length} users...`); // 👈 Add this log
-        if (users.length > 0) {
-          sendPropertyAlert(users, savedListing)
-            .then((results) => {
-              const successes = results.filter(
-                (r) => r.status === "fulfilled",
-              ).length;
-              console.log(
-                `✅ ${successes}/${users.length} Emails sent successfully`,
-              );
-            })
-            .catch((err) => console.error("❌ Mailer Error:", err));
-        }
+        console.log(`📧 Dispatching API emails to ${users.length} users...`);
+        sendPropertyAlert(users, savedListing)
+          .then(() => console.log("✅ API Dispatch Complete"))
+          .catch((err) => console.error("❌ API Error:", err));
       });
 
       res.status(201).json(savedListing);
