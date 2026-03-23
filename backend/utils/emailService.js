@@ -1,20 +1,10 @@
-const Mailjet = require("node-mailjet");
-
-const mailjet = Mailjet.apiConnect(
-  process.env.MAILJET_API_KEY,
-  process.env.MAILJET_SECRET_KEY,
-);
+const axios = require("axios");
 
 const sendPropertyAlert = async (users, property) => {
   if (!users || users.length === 0) return;
 
-  // 1. Force HTTPS and Clean Cloudinary URLs
-  let propertyImage =
+  const propertyImage =
     property.images?.[0] || "https://estatera.onrender.com/og-image.png";
-  if (propertyImage.startsWith("http://")) {
-    propertyImage = propertyImage.replace("http://", "https://");
-  }
-
   const propertyTitle = property.title || "Exclusive Listing";
   const propertyPrice = property.price
     ? `₹${property.price.toLocaleString()}`
@@ -22,84 +12,57 @@ const sendPropertyAlert = async (users, property) => {
   const frontendUrl =
     process.env.FRONTEND_URL || "https://estatera.onrender.com";
 
-  const recipients = users.map((user) => ({
-    Email: user.email,
-    Name: user.name || "Valued Member",
-  }));
+  const htmlContent = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; background-color: #ffffff;">
+      <div style="background: #2563eb; padding: 30px; text-align: center; color: white;">
+        <h1 style="margin: 0;">ESTATERA</h1>
+      </div>
+      <img src="${propertyImage}" width="600" style="width: 100%; display: block;" />
+      <div style="padding: 30px;">
+        <h2>${propertyTitle}</h2>
+        <p style="color: #2563eb; font-size: 24px; font-weight: bold;">${propertyPrice}</p>
+        <p>📍 ${property.location}</p>
+        <a href="${frontendUrl}/property/${property._id}" style="background: #2563eb; color: white; padding: 12px 25px; text-decoration: none; border-radius: 10px; display: inline-block; margin-top: 20px; font-weight: bold;">View Details</a>
+      </div>
+    </div>
+  `;
 
-  try {
-    await mailjet.post("send", { version: "v3.1" }).request({
-      Messages: [
-        {
-          From: {
-            Email: "estatera.team@gmail.com", // 🛡️ SEE SPAM FIX NOTE BELOW
-            Name: "Estatera Luxury",
-          },
-          To: recipients,
-          Subject: `✨ New Luxury Property in ${property.location}: ${propertyTitle}`,
-
-          // 🛡️ SPAM FIX: Always include a Text version
-          TextPart: `New Property Alert: ${propertyTitle} available for ${propertyPrice}. View details here: ${frontendUrl}/property/${property._id}`,
-
-          // 🖼️ IMAGE & LAYOUT FIX: Table-based layout is best for emails
-          HTMLPart: `
-            <div style="font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7fa; padding: 20px;">
-              <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0;">
-                
-                <!-- Header -->
-                <tr>
-                  <td align="center" style="padding: 30px; background-color: #2563eb;">
-                    <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 2px;">ESTATERA</h1>
-                  </td>
-                </tr>
-
-                <!-- Property Image (FIXED TAG) -->
-                <tr>
-                  <td align="center">
-                    <img src="${propertyImage}" alt="${propertyTitle}" width="600" style="width: 100%; max-width: 600px; display: block; height: auto;" border="0" />
-                  </td>
-                </tr>
-
-                <!-- Content -->
-                <tr>
-                  <td style="padding: 40px;">
-                    <h2 style="color: #1e293b; font-size: 22px; margin: 0 0 10px 0;">${propertyTitle}</h2>
-                    <p style="color: #2563eb; font-size: 26px; font-weight: bold; margin: 0 0 10px 0;">${propertyPrice}</p>
-                    <p style="color: #64748b; font-size: 16px; margin: 0 0 30px 0;">📍 ${property.location}</p>
-                    
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                      <tr>
-                        <td align="center">
-                          <a href="${frontendUrl}/property/${property._id}" 
-                             style="background-color: #2563eb; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 16px;">
-                             View Full Details
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-
-                <!-- Footer (SPAM FIX: Unsubscribe) -->
-                <tr>
-                  <td style="padding: 20px; background-color: #f8fafc; text-align: center; border-top: 1px solid #e2e8f0;">
-                    <p style="font-size: 12px; color: #94a3b8; margin: 0;">
-                      Estatera Real Estate Group, Chennai, India. <br>
-                      You are receiving this because you signed up on our platform. <br>
-                      <a href="#" style="color: #2563eb;">Unsubscribe</a>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          `,
+  const emailPromises = users.map((user) => {
+    return axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: { name: "Estatera Luxury", email: "estatera.team@gmail.com" }, // 🛡️ MUST BE VERIFIED IN BREVO
+        to: [{ email: user.email, name: user.name || "Valued Member" }],
+        subject: `✨ New Luxury Property: ${propertyTitle}`,
+        htmlContent: htmlContent,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-      ],
-    });
-    console.log(`✅ Success: Alert sent to ${users.length} users.`);
-  } catch (error) {
-    console.error("❌ Mailjet API Error:", error.statusCode);
-  }
+      },
+    );
+  });
+
+  const results = await Promise.allSettled(emailPromises);
+
+  // 🕵️ SUPER DEBUGGER: This will tell us EXACTLY why it says 0/3
+  results.forEach((res, i) => {
+    if (res.status === "fulfilled") {
+      console.log(`✅ Success: Email sent to ${users[i].email}`);
+    } else {
+      console.error(`❌ REJECTED for ${users[i].email}:`);
+      // Logs the specific error from Brevo (e.g., 'unauthorized', 'quota_exceeded', etc.)
+      console.error("Reason:", res.reason.response?.data || res.reason.message);
+    }
+  });
+
+  const successCount = results.filter((r) => r.status === "fulfilled").length;
+  console.log(
+    `📊 Final Result: ${successCount}/${users.length} emails delivered.`,
+  );
 };
 
 module.exports = { sendPropertyAlert };
