@@ -5,131 +5,141 @@ const sendPropertyAlert = async (users, property) => {
 
   const propertyImage =
     property.images?.[0] || "https://estatera.onrender.com/og-image.png";
-  const propertyTitle = property.title || "Exclusive Listing";
+  const propertyTitle = property.title || "New Property";
   const propertyPrice = property.price
     ? `₹${property.price.toLocaleString()}`
-    : "Price on Request";
+    : "Upon Request";
   const frontendUrl =
     process.env.FRONTEND_URL || "https://estatera.onrender.com";
 
-  const htmlContent = `
+  const emailPromises = users.map((user) => {
+    // 🛡️ PRIMARY INBOX LOGIC: Use the user's name
+    const firstName = user.name ? user.name.split(" ")[0] : "there";
+
+    const htmlContent = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
-      <style>
-        /* Mobile responsive adjustments */
-        @media only screen and (max-width: 600px) {
-          .inner-table { width: 100% !important; }
-          .hero-image { height: 250px !important; }
-          .content-padding { padding: 30px 20px !important; }
-        }
-      </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${propertyTitle}</title>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-      <!-- Pre-header text (Hidden in email but shows in inbox preview) -->
+    <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+      
+      <!-- Hidden Preheader: Inbox Preview -->
       <div style="display: none; max-height: 0px; overflow: hidden;">
-        A new architectural masterpiece has just arrived in ${property.location}. View the private listing details inside.
+        Hi ${firstName}, I thought you might be interested in this new architectural piece in ${property.location}...
       </div>
 
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 40px 0;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff;">
         <tr>
-          <td align="center">
-            <table class="inner-table" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.08);">
+          <td align="center" style="padding: 20px 0;">
+            <table border="0" cellpadding="0" cellspacing="0" width="600" style="width: 600px; max-width: 600px;">
               
-              <!-- Premium Header -->
+              <!-- Simple Professional Header -->
               <tr>
-                <td align="center" style="padding: 40px 0; background-color: #ffffff;">
-                  <h1 style="color: #1e293b; margin: 0; font-size: 22px; letter-spacing: 4px; font-weight: 900;">ESTATERA</h1>
-                  <p style="color: #64748b; margin: 5px 0 0 0; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Luxury Living Redefined</p>
+                <td style="padding: 20px 0 40px 0; text-align: left;">
+                  <h1 style="margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 3px; color: #0f172a; text-transform: uppercase;">ESTATERA</h1>
+                  <p style="margin: 4px 0 0 0; font-size: 10px; color: #64748b; letter-spacing: 1px; font-weight: 600;">PORTFOLIO UPDATE</p>
                 </td>
               </tr>
 
-              <!-- Hero Section with Just Listed Badge -->
+              <!-- Personal Opening (Kills Promotions Tab detection) -->
               <tr>
-                <td style="position: relative; background-color: #ffffff;">
-                  <img src="${propertyImage.replace("http://", "https://")}" 
-                       alt="${propertyTitle}" 
-                       width="600" 
-                       class="hero-image"
-                       style="display: block; width: 600px; height: 380px; object-fit: cover; border: 0;" />
+                <td style="padding-bottom: 30px; line-height: 1.6; color: #334155; font-size: 16px;">
+                  Hi ${firstName}, <br><br>
+                  A rare opportunity has just been added to our collection in <strong>${property.location}</strong>. 
+                  Given your interest in premium ${property.propertyType.toLowerCase()}s, I wanted to ensure you saw the presentation first.
                 </td>
               </tr>
 
-              <!-- Content Body -->
+              <!-- Hero Cinematic Image -->
               <tr>
-                <td class="content-padding" style="padding: 50px 50px 40px 50px;">
+                <td>
+                  <a href="${frontendUrl}/property/${property._id}" style="text-decoration: none;">
+                    <img src="${propertyImage.replace("http://", "https://")}" 
+                         alt="${propertyTitle}" 
+                         width="600" 
+                         style="display: block; width: 600px; height: 400px; object-fit: cover; border-radius: 2px; border: 0;" />
+                  </a>
+                </td>
+              </tr>
+
+              <!-- Details Section -->
+              <tr>
+                <td style="padding: 40px 0;">
                   <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tr>
-                      <td>
-                        <span style="background-color: #eff6ff; color: #2563eb; padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Exclusive New Entry</span>
-                        <h2 style="color: #1e293b; font-size: 28px; font-weight: 800; margin: 20px 0 10px 0; line-height: 1.2;">${propertyTitle}</h2>
-                        <p style="color: #64748b; font-size: 16px; margin: 0 0 30px 0; line-height: 1.6;">Located in the prestigious neighborhood of <strong>${property.location}</strong>, this property offers unparalleled elegance and modern design.</p>
-                      </td>
-                    </tr>
-                    
-                    <!-- Specs Bar -->
-                    <tr>
-                      <td>
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; border-radius: 16px; margin-bottom: 35px;">
-                          <tr>
-                            <td style="padding: 20px; text-align: center;">
-                              <p style="margin: 0; color: #94a3b8; font-size: 10px; font-weight: bold; text-transform: uppercase;">Market Value</p>
-                              <p style="margin: 5px 0 0 0; color: #1e293b; font-size: 18px; font-weight: 800;">${propertyPrice}</p>
-                            </td>
-                            <td style="padding: 20px; text-align: center; border-left: 1px solid #e2e8f0;">
-                              <p style="margin: 0; color: #94a3b8; font-size: 10px; font-weight: bold; text-transform: uppercase;">Total Area</p>
-                              <p style="margin: 5px 0 0 0; color: #1e293b; font-size: 18px; font-weight: 800;">${property.size}</p>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-
-                    <!-- CTA Button -->
-                    <tr>
-                      <td align="center">
-                        <a href="${frontendUrl}/property/${property._id}" 
-                           style="background-color: #2563eb; color: #ffffff; padding: 20px 45px; text-decoration: none; border-radius: 14px; font-weight: 800; display: inline-block; font-size: 16px; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);">
-                           View Full Presentation
-                        </a>
+                      <td style="vertical-align: top;">
+                        <h2 style="margin: 0; color: #0f172a; font-size: 32px; font-weight: 800; line-height: 1.1; letter-spacing: -1px;">
+                          ${propertyTitle}
+                        </h2>
+                        <p style="margin: 15px 0 0 0; color: #475569; font-size: 15px; line-height: 1.7; max-width: 480px;">
+                          ${property.description?.substring(0, 180)}...
+                        </p>
                       </td>
                     </tr>
                   </table>
                 </td>
               </tr>
 
+              <!-- High-End Specs Grid -->
+              <tr>
+                <td style="padding-bottom: 50px;">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; padding: 25px 0;">
+                    <tr>
+                      <td width="33%">
+                         <p style="margin: 0; font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Investment</p>
+                         <p style="margin: 5px 0 0 0; font-size: 18px; color: #2563eb; font-weight: 700;">${propertyPrice}</p>
+                      </td>
+                      <td width="33%" style="border-left: 1px solid #f1f5f9; padding-left: 20px;">
+                         <p style="margin: 0; font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Area</p>
+                         <p style="margin: 5px 0 0 0; font-size: 18px; color: #0f172a; font-weight: 700;">${property.size}</p>
+                      </td>
+                      <td width="33%" style="border-left: 1px solid #f1f5f9; padding-left: 20px;">
+                         <p style="margin: 0; font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Status</p>
+                         <p style="margin: 5px 0 0 0; font-size: 18px; color: #10b981; font-weight: 700;">Verified</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- CTA Button -->
+              <tr>
+                <td align="center">
+                  <a href="${frontendUrl}/property/${property._id}" 
+                     style="background-color: #0f172a; color: #ffffff; padding: 22px 50px; text-decoration: none; font-size: 14px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; display: inline-block; border-radius: 0px;">
+                     Explore Presentation
+                  </a>
+                </td>
+              </tr>
+
               <!-- Footer -->
               <tr>
-                <td style="padding: 40px; background-color: #1e293b; text-align: center;">
-                  <p style="color: #94a3b8; font-size: 12px; margin: 0; line-height: 1.8;">
-                    You are receiving this exclusive alert because you are a valued member of the Estatera Inner Circle.
-                  </p>
-                  <div style="margin-top: 20px;">
-                    <a href="#" style="color: #ffffff; text-decoration: none; font-size: 11px; font-weight: bold; margin: 0 10px;">Privacy Policy</a>
-                    <a href="#" style="color: #ffffff; text-decoration: none; font-size: 11px; font-weight: bold; margin: 0 10px;">Unsubscribe</a>
-                  </div>
-                  <p style="color: #475569; font-size: 10px; margin-top: 30px;">
-                    © ${new Date().getFullYear()} Estatera Real Estate Group.<br>
-                    Global Headquarters: Chennai, India.
+                <td style="padding: 100px 0 40px 0; border-top: 1px solid #f1f5f9; margin-top: 60px;">
+                  <p style="color: #94a3b8; font-size: 11px; line-height: 1.8; text-align: center;">
+                    <strong>Estatera Realty Group</strong><br>
+                    Chennai, Tamil Nadu. Confidential Listing Alert.<br><br>
+                    To modify your alert preferences, <a href="#" style="color: #64748b; text-decoration: underline;">click here</a>.
                   </p>
                 </td>
               </tr>
+
             </table>
           </td>
         </tr>
       </table>
     </body>
     </html>
-  `;
+    `;
 
-  const emailPromises = users.map((user) => {
     return axios.post(
       "https://api.brevo.com/v3/smtp/email",
       {
-        sender: { name: "Estatera Luxury", email: "estatera.team@gmail.com" }, // 🛡️ MUST BE VERIFIED IN BREVO
-        to: [{ email: user.email, name: user.name || "Valued Member" }],
-        subject: `✨ New Luxury Property: ${propertyTitle}`,
+        sender: { name: "Estatera", email: "estatera.team@gmail.com" },
+        to: [{ email: user.email, name: user.name || "Member" }],
+        subject: `Property Update: ${propertyTitle} in ${property.location}`,
         htmlContent: htmlContent,
       },
       {
@@ -143,21 +153,8 @@ const sendPropertyAlert = async (users, property) => {
   });
 
   const results = await Promise.allSettled(emailPromises);
-
-  // 🕵️ SUPER DEBUGGER: This will tell us EXACTLY why it says 0/3
-  results.forEach((res, i) => {
-    if (res.status === "fulfilled") {
-      console.log(`✅ Success: Email sent to ${users[i].email}`);
-    } else {
-      console.error(`❌ REJECTED for ${users[i].email}:`);
-      // Logs the specific error from Brevo (e.g., 'unauthorized', 'quota_exceeded', etc.)
-      console.error("Reason:", res.reason.response?.data || res.reason.message);
-    }
-  });
-
-  const successCount = results.filter((r) => r.status === "fulfilled").length;
   console.log(
-    `📊 Final Result: ${successCount}/${users.length} emails delivered.`,
+    `📊 Extraordinary Dispatch Complete: ${results.filter((r) => r.status === "fulfilled").length} primary inbox attempts.`,
   );
 };
 
