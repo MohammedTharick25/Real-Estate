@@ -13,18 +13,51 @@ const sendPropertyAlert = async (users, property) => {
     process.env.FRONTEND_URL || "https://estatera.onrender.com";
 
   const htmlContent = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; background-color: #ffffff;">
-      <div style="background: #2563eb; padding: 30px; text-align: center; color: white;">
-        <h1 style="margin: 0;">ESTATERA</h1>
-      </div>
-      <img src="${propertyImage}" width="600" style="width: 100%; display: block;" />
-      <div style="padding: 30px;">
-        <h2>${propertyTitle}</h2>
-        <p style="color: #2563eb; font-size: 24px; font-weight: bold;">${propertyPrice}</p>
-        <p>📍 ${property.location}</p>
-        <a href="${frontendUrl}/property/${property._id}" style="background: #2563eb; color: white; padding: 12px 25px; text-decoration: none; border-radius: 10px; display: inline-block; margin-top: 20px; font-weight: bold;">View Details</a>
-      </div>
-    </div>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; background-color: #f4f7fa; padding: 20px;">
+      <tr>
+        <td align="center">
+          <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <!-- Header -->
+            <tr>
+              <td align="center" style="padding: 30px; background-color: #2563eb;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 2px;">ESTATERA</h1>
+              </td>
+            </tr>
+            <!-- Image -->
+            <tr>
+              <td>
+                <img src="${propertyImage.replace("http://", "https://")}" 
+                     alt="${propertyTitle}" 
+                     width="600" 
+                     style="display: block; width: 600px; height: 350px; object-fit: cover; border: 0;" />
+              </td>
+            </tr>
+            <!-- Body -->
+            <tr>
+              <td style="padding: 40px;">
+                <h2 style="color: #1e293b; font-size: 22px; margin: 0 0 10px 0;">${propertyTitle}</h2>
+                <p style="color: #2563eb; font-size: 26px; font-weight: bold; margin: 0;">${propertyPrice}</p>
+                <p style="color: #64748b; font-size: 16px; margin: 10px 0 30px 0;">📍 ${property.location}</p>
+                
+                <div style="text-align: center;">
+                  <a href="${frontendUrl}/property/${property._id}" 
+                     style="background-color: #2563eb; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                     View Full Details
+                  </a>
+                </div>
+              </td>
+            </tr>
+            <!-- Footer -->
+            <tr>
+              <td style="padding: 20px; background-color: #f8fafc; text-align: center; color: #94a3b8; font-size: 12px; border-top: 1px solid #f1f5f9;">
+                © ${new Date().getFullYear()} Estatera Real Estate. All rights reserved.<br>
+                Chennai, India.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   `;
 
   const emailPromises = users.map((user) => {
