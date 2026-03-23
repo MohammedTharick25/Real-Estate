@@ -48,7 +48,7 @@ router.post(
         console.log(`📧 Dispatching API emails to ${users.length} users...`);
         sendPropertyAlert(users, savedListing)
           .then(() => console.log("✅ API Dispatch Complete"))
-          .catch((err) => console.error("❌ API Error:", err));
+          .catch((err) => console.error("❌ API Error:", err.message));
       });
 
       res.status(201).json(savedListing);
