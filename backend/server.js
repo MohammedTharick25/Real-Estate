@@ -4,6 +4,7 @@ require("dotenv").config();
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server
@@ -65,6 +66,7 @@ app.use(
   }),
 );
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 // Routes
 app.use("/api/listings", require("./routes/listingRoutes"));
@@ -75,6 +77,10 @@ app.use("/api/admin", require("./routes/adminRoutes"));
 
 app.get("/health", (req, res) => {
   res.status(200).send("Server is awake");
+});
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
 
 // Database Connection
