@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <p align="center">
-  <img src="public/home-screen-screenshot.png" alt="Estatera Preview" width="100%" />
+  <img src="frontend/public/home-screen-screenshot.png" alt="Estatera Preview" width="100%" />
 </p>
 
 <p align="center">
