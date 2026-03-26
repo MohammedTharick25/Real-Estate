@@ -82,7 +82,7 @@
 
 ## 👨‍💻 Author
 
-**Mohammed Tharick**
+**Mohammed Tharick**  
 Lead Full-Stack Architect
 
 <p align="center">
