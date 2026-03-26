@@ -1,5 +1,13 @@
 # 🏰 Estatera — Luxury Living Redefined
 
+<p align="center">
+  <img src="home-screen-screenshot" alt="Estatera Preview" width="100%" />
+</p>
+
+<p align="center">
+  <a href="https://estatera.onrender.com"><strong>🌐 Live Demo</strong></a>
+</p>
+
 [![Project Status: Active](https://img.shields.io/badge/Project%20Status-Active-brightgreen.svg)](https://real-estate-51c8.onrender.com)
 [![Framework: React 19](https://img.shields.io/badge/Framework-React%2019-blue.svg)](https://react.dev/)
 [![Backend: Node.js](https://img.shields.io/badge/Backend-Node.js-orange.svg)](https://nodejs.org/)
@@ -22,7 +30,7 @@
 ### 👔 Executive Administrative Suite (BI)
 
 - **Business Intelligence Dashboard:** Real-time analytics powered by `Recharts` visualizing revenue trends, inventory share, and property popularity.
-- **Automated Marketing Engine:** Extraordinary transactional property alerts sent via **Brevo API** to all active members using personalized, high-conversion HTML templates.
+- **Automated Marketing Engine:** Automated property alerts via Brevo API using personalized HTML templates.
 - **Community Governance:** Full user lifecycle management including a "Security Heartbeat" that terminates blocked sessions in real-time.
 - **Intelligence Reports:** One-click export of business performance data to CSV and professional-grade PDF formats.
 
@@ -46,6 +54,15 @@
 
 ---
 
+## 🧩 System Architecture
+
+- Client → React (PWA)
+- API → Express + JWT Auth
+- Real-time → Socket.io
+- Storage → MongoDB + Cloudinary
+
+---
+
 ## 📈 Performance Engineering
 
 **Network Optimization**: Utilizes family: 4 forced IPv4 routing for high-reliability cloud deployment on Render.
@@ -65,8 +82,10 @@
 
 ## 👨‍💻 Author
 
-**Mohammed Tharick**
-Lead Full-Stack Architect
+<p align="center">
+  <a href="https://github.com/MohammedTharick25/Personal-Portfolio-React">Portfolio</a> •
+  <a href="https://www.linkedin.com/in/mdtharick/">LinkedIn</a>
+</p>
 
 ![alt text](https://img.shields.io/badge/Portfolio-Visit%20Site-blue?style=flat-square)
 
