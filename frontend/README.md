@@ -1,18 +1,18 @@
 # 🏰 Estatera — Luxury Living Redefined
 
-<p align="center">
-  <img src="home-screen-screenshot" alt="Estatera Preview" width="100%" />
-</p>
-
-<p align="center">
-  <a href="https://estatera.onrender.com"><strong>🌐 Live Demo</strong></a>
-</p>
-
 [![Project Status: Active](https://img.shields.io/badge/Project%20Status-Active-brightgreen.svg)](https://real-estate-51c8.onrender.com)
 [![Framework: React 19](https://img.shields.io/badge/Framework-React%2019-blue.svg)](https://react.dev/)
 [![Backend: Node.js](https://img.shields.io/badge/Backend-Node.js-orange.svg)](https://nodejs.org/)
 [![Database: MongoDB](https://img.shields.io/badge/Database-MongoDB-green.svg)](https://www.mongodb.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+<p align="center">
+  <img src="home-screen-screenshot.png" alt="Estatera Preview" width="100%" />
+</p>
+
+<p align="center">
+  <a href="https://estatera.onrender.com"><strong>🌐 Live Demo</strong></a>
+</p>
 
 **Estatera** is an elite, full-stack real estate ecosystem designed for high-net-worth investors and premium property seekers. Combining a cinematic front-end experience with a robust executive administrative suite, Estatera streamlines the journey from property discovery to legal acquisition.
 
@@ -83,13 +83,13 @@
 ## 👨‍💻 Author
 
 <p align="center">
-  <a href="https://github.com/MohammedTharick25/Personal-Portfolio-React">Portfolio</a> •
-  <a href="https://www.linkedin.com/in/mdtharick/">LinkedIn</a>
+  <a href="https://mt-personal-portfolio.netlify.app/">
+    <img src="https://img.shields.io/badge/Portfolio-Visit%20Site-blue?style=flat-square" />
+  </a>
+  <a href="https://www.linkedin.com/in/mdtharick/">
+    <img src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin" />
+  </a>
 </p>
-
-![alt text](https://img.shields.io/badge/Portfolio-Visit%20Site-blue?style=flat-square)
-
-![alt text](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)
 
 ---
 
