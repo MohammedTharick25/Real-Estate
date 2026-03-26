@@ -47,9 +47,20 @@ msgstr ""
 msgid "10k+ Happy Clients"
 msgstr "10,000+ खुश ग्राहक"
 
+#: frontend/src/pages/Login.jsx:39
+msgid "Access granted. Welcome back."
+msgstr ""
+
+#: frontend/src/pages/Login.jsx:165
+msgid "Access Key"
+msgstr ""
+
+#: frontend/src/pages/Signup.jsx:39
+msgid "Account created successfully! Welcome."
+msgstr ""
+
 #: frontend/src/components/PropertyCard.jsx:16
 #: frontend/src/pages/PropertyDetails.jsx:71
-#: frontend/src/pages/Signup.jsx:29
 msgid "Account created! Please login."
 msgstr "खाता बन गया है! कृपया लॉगिन करें।"
 
@@ -57,7 +68,7 @@ msgstr "खाता बन गया है! कृपया लॉगिन �
 msgid "Account Tier"
 msgstr "खाता स्तर"
 
-#: frontend/src/pages/AdminDashboard.jsx:651
+#: frontend/src/pages/AdminDashboard.jsx:668
 msgid "Active"
 msgstr "सक्रिय"
 
@@ -65,7 +76,7 @@ msgstr "सक्रिय"
 #~ msgid "Add Listing"
 #~ msgstr "लिस्टिंग जोड़ें"
 
-#: frontend/src/pages/AdminDashboard.jsx:564
+#: frontend/src/pages/AdminDashboard.jsx:581
 msgid "Add Property"
 msgstr "प्रॉपर्टी जोड़ें"
 
@@ -83,18 +94,22 @@ msgstr "सभी प्रॉपर्टीज"
 #~ msgstr "सभी प्रकार"
 
 #: frontend/src/pages/Signup.jsx:98
-msgid "Already have an account?"
-msgstr "क्या आपके पास पहले से खाता है?"
+#~ msgid "Already have an account?"
+#~ msgstr "क्या आपके पास पहले से खाता है?"
 
-#: frontend/src/pages/PropertyDetails.jsx:424
+#: frontend/src/pages/Signup.jsx:226
+msgid "Already part of the inner circle?"
+msgstr ""
+
+#: frontend/src/pages/PropertyDetails.jsx:462
 msgid "Amenities"
 msgstr "सुविधाएं"
 
-#: frontend/src/pages/AdminDashboard.jsx:964
+#: frontend/src/pages/AdminDashboard.jsx:981
 msgid "Amenities (comma separated)"
 msgstr "सुविधाएं (कोमा से अलग करें)"
 
-#: frontend/src/pages/AdminDashboard.jsx:555
+#: frontend/src/pages/AdminDashboard.jsx:572
 msgid "Analytics"
 msgstr "एनालिटिक्स"
 
@@ -114,6 +129,10 @@ msgstr "अपार्टमेंट्स"
 msgid "Asking Price"
 msgstr "मांगी गई कीमत"
 
+#: frontend/src/pages/Login.jsx:42
+msgid "Authentication failed. Check your access keys."
+msgstr ""
+
 #: frontend/src/pages/Profile.jsx:296
 msgid "Authorized Capabilities"
 msgstr "अधिकृत क्षमताएं"
@@ -125,6 +144,11 @@ msgstr "उपलब्ध लिस्टिंग"
 #: frontend/src/pages/PropertyDetails.jsx:315
 msgid "Back"
 msgstr "पीछे"
+
+#: frontend/src/pages/Login.jsx:124
+#: frontend/src/pages/Signup.jsx:137
+msgid "Back to exploration"
+msgstr ""
 
 #: frontend/src/pages/PropertyDetails.jsx:323
 msgid "Brochure"
@@ -141,12 +165,12 @@ msgid "Browse Properties"
 msgstr "प्रॉपर्टीज देखें"
 
 #: frontend/src/pages/PropertyDetails.jsx:539
-msgid "By clicking, you agree to our terms of service and privacy policy."
-msgstr "क्लिक करके, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।"
+#~ msgid "By clicking, you agree to our terms of service and privacy policy."
+#~ msgstr "क्लिक करके, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।"
 
 #: frontend/src/components/Footer.jsx:46
 #: frontend/src/components/Footer.jsx:67
-#: frontend/src/pages/Contact.jsx:56
+#: frontend/src/pages/Contact.jsx:57
 msgid "Call Us"
 msgstr "हमें कॉल करें"
 
@@ -154,15 +178,15 @@ msgstr "हमें कॉल करें"
 msgid "Category"
 msgstr "श्रेणी"
 
-#: frontend/src/pages/AdminDashboard.jsx:953
+#: frontend/src/pages/AdminDashboard.jsx:970
 msgid "Commission (%)"
 msgstr "कमीशन (%)"
 
-#: frontend/src/pages/AdminDashboard.jsx:645
+#: frontend/src/pages/AdminDashboard.jsx:662
 msgid "Commission Revenue"
 msgstr "कमीशन राजस्व"
 
-#: frontend/src/pages/AdminDashboard.jsx:582
+#: frontend/src/pages/AdminDashboard.jsx:599
 msgid "Community"
 msgstr "समुदाय"
 
@@ -175,7 +199,7 @@ msgid "Contact Agent"
 msgstr "एजेंट से संपर्क करें"
 
 #: frontend/src/components/Footer.jsx:62
-#: frontend/src/pages/Contact.jsx:37
+#: frontend/src/pages/Contact.jsx:38
 msgid "Contact Our Experts"
 msgstr "हमारे विशेषज्ञों से संपर्क करें"
 
@@ -183,22 +207,26 @@ msgstr "हमारे विशेषज्ञों से संपर्क
 msgid "Contact us at support@estatera@gmail.com for more information regarding this property."
 msgstr "इस प्रॉपर्टी के बारे में अधिक जानकारी के लिए हमसे support@estatera@gmail.com पर संपर्क करें।"
 
-#: frontend/src/pages/AdminDashboard.jsx:663
+#: frontend/src/pages/AdminDashboard.jsx:680
 msgid "Conversion"
 msgstr "कन्वर्जन"
 
-#: frontend/src/pages/AdminDashboard.jsx:434
+#: frontend/src/pages/AdminDashboard.jsx:451
 msgid "Could not publish property."
 msgstr "प्रॉपर्टी प्रकाशित नहीं की जा सकी।"
 
 #: frontend/src/pages/Login.jsx:91
 #: frontend/src/pages/Signup.jsx:49
-msgid "Create Account"
-msgstr "खाता बनाएं"
+#~ msgid "Create Account"
+#~ msgstr "खाता बनाएं"
+
+#: frontend/src/pages/Signup.jsx:151
+msgid "Create your membership to access the world's most prestigious property portfolio."
+msgstr ""
 
 #: frontend/src/pages/Signup.jsx:92
-msgid "Creating Account..."
-msgstr "खाता बनाया जा रहा है..."
+#~ msgid "Creating Account..."
+#~ msgstr "खाता बनाया जा रहा है..."
 
 #: frontend/src/pages/Profile.jsx:249
 #~ msgid "Current Role"
@@ -208,12 +236,12 @@ msgstr "खाता बनाया जा रहा है..."
 #~ msgid "Delete permanently?"
 #~ msgstr "स्थायी रूप से हटाएं?"
 
-#: frontend/src/pages/AdminDashboard.jsx:191
+#: frontend/src/pages/AdminDashboard.jsx:200
 msgid "Delete User?"
 msgstr "यूजर हटाएं?"
 
-#: frontend/src/pages/AdminDashboard.jsx:1071
-#: frontend/src/pages/PropertyDetails.jsx:415
+#: frontend/src/pages/AdminDashboard.jsx:1088
+#: frontend/src/pages/PropertyDetails.jsx:453
 msgid "Description"
 msgstr "विवरण"
 
@@ -234,13 +262,17 @@ msgstr "अपने भविष्य के लिए डिज़ाइन �
 #~ msgid "Distance Radius"
 #~ msgstr "दूरी का दायरा"
 
-#: frontend/src/pages/PropertyDetails.jsx:534
+#: frontend/src/pages/PropertyDetails.jsx:563
 msgid "Download Brochure"
 msgstr "ब्रोशर डाउनलोड करें"
 
-#: frontend/src/pages/AdminDashboard.jsx:1038
+#: frontend/src/pages/AdminDashboard.jsx:1055
 msgid "e.g. 1500 Sq Ft or 0.5 Acres"
 msgstr "उदा. 1500 वर्ग फुट या 0.5 एकड़"
+
+#: frontend/src/pages/Signup.jsx:110
+msgid "Early Access"
+msgstr ""
 
 #: frontend/src/components/Footer.jsx:54
 #: frontend/src/components/Navbar.jsx:171
@@ -250,43 +282,50 @@ msgstr "उदा. 1500 वर्ग फुट या 0.5 एकड़"
 msgid "Edit Profile"
 msgstr "प्रोफ़ाइल संपादित करें"
 
-#: frontend/src/pages/Login.jsx:53
 #: frontend/src/pages/Profile.jsx:230
 #: frontend/src/pages/Profile.jsx:503
-#: frontend/src/pages/PropertyDetails.jsx:497
+#: frontend/src/pages/PropertyDetails.jsx:535
 msgid "Email"
 msgstr "ईमेल"
 
-#: frontend/src/pages/Contact.jsx:116
-#: frontend/src/pages/Signup.jsx:71
+#: frontend/src/pages/Contact.jsx:117
+#: frontend/src/pages/Signup.jsx:170
 msgid "Email Address"
 msgstr "ईमेल पता"
 
 #: frontend/src/components/Footer.jsx:66
-#: frontend/src/pages/Contact.jsx:72
+#: frontend/src/pages/Contact.jsx:73
 msgid "Email Us"
 msgstr "हमें ईमेल करें"
 
-#: frontend/src/pages/PropertyDetails.jsx:442
+#: frontend/src/pages/PropertyDetails.jsx:478
 msgid "EMI Calculator"
 msgstr "ईएमआई कैलकुलेटर"
+
+#: frontend/src/pages/Login.jsx:108
+msgid "Encrypted Session"
+msgstr ""
 
 #: frontend/src/pages/Profile.jsx:242
 #: frontend/src/pages/Profile.jsx:512
 msgid "English"
 msgstr "अंग्रेजी"
 
-#: frontend/src/pages/AdminDashboard.jsx:355
+#: frontend/src/pages/AdminDashboard.jsx:364
 msgid "Enter a location to search!"
 msgstr "खोजने के लिए स्थान दर्ज करें!"
 
-#: frontend/src/pages/AdminDashboard.jsx:938
+#: frontend/src/pages/AdminDashboard.jsx:955
 msgid "Enter price"
 msgstr "कीमत दर्ज करें"
 
+#: frontend/src/pages/Signup.jsx:106
+msgid "Every listing is verified by our internal legal team."
+msgstr ""
+
 #: frontend/src/pages/Login.jsx:58
-msgid "example@gmail.com"
-msgstr "example@gmail.com"
+#~ msgid "example@gmail.com"
+#~ msgstr "example@gmail.com"
 
 #: frontend/src/pages/Listings.jsx:272
 msgid "Exclusive Collections"
@@ -296,7 +335,7 @@ msgstr "विशेष संग्रह"
 msgid "Failed to generate PDF"
 msgstr "PDF बनाने में विफल"
 
-#: frontend/src/pages/Contact.jsx:25
+#: frontend/src/pages/Contact.jsx:26
 #: frontend/src/pages/Profile.jsx:90
 msgid "Failed to send message"
 msgstr "संदेश भेजने में विफल"
@@ -309,7 +348,7 @@ msgstr "संदेश भेजने में विफल"
 msgid "Failed to send visit request, Try again"
 msgstr "विजिट अनुरोध भेजने में विफल, पुनः प्रयास करें"
 
-#: frontend/src/pages/AdminDashboard.jsx:376
+#: frontend/src/pages/AdminDashboard.jsx:385
 msgid "Failed to sync location."
 msgstr "स्थान सिंक करने में विफल।"
 
@@ -317,7 +356,7 @@ msgstr "स्थान सिंक करने में विफल।"
 #~ msgid "Failed to update status: {0}"
 #~ msgstr "स्थिति अपडेट करने में विफल: {0}"
 
-#: frontend/src/pages/AdminDashboard.jsx:320
+#: frontend/src/pages/AdminDashboard.jsx:329
 msgid "Failed to update status."
 msgstr "स्थिति अपडेट करने में विफल।"
 
@@ -325,11 +364,11 @@ msgstr "स्थिति अपडेट करने में विफल�
 msgid "Featured"
 msgstr "फीचर्ड"
 
-#: frontend/src/pages/AdminDashboard.jsx:1090
+#: frontend/src/pages/AdminDashboard.jsx:1107
 msgid "Featured Property"
 msgstr "विशेष प्रॉपर्टी"
 
-#: frontend/src/pages/AdminDashboard.jsx:397
+#: frontend/src/pages/AdminDashboard.jsx:406
 msgid "Fill required fields!"
 msgstr "आवश्यक फ़ील्ड भरें!"
 
@@ -350,16 +389,24 @@ msgid "Full Access"
 msgstr "पूर्ण एक्सेस"
 
 #: frontend/src/components/Navbar.jsx:99
-#: frontend/src/pages/Contact.jsx:108
+#: frontend/src/pages/Contact.jsx:109
 #: frontend/src/pages/Profile.jsx:224
 #: frontend/src/pages/Profile.jsx:494
-#: frontend/src/pages/Signup.jsx:61
+#: frontend/src/pages/Signup.jsx:157
 msgid "Full Name"
 msgstr "पूरा नाम"
 
 #: frontend/src/pages/PropertyDetails.jsx:156
 msgid "Generating high-quality brochure..."
 msgstr "उच्च गुणवत्ता वाला ब्रोशर तैयार किया जा रहा है..."
+
+#: frontend/src/pages/Signup.jsx:111
+msgid "Get notified about prime locations before they hit the public market."
+msgstr ""
+
+#: frontend/src/pages/Login.jsx:101
+msgid "Global Portfolios"
+msgstr ""
 
 #: frontend/src/pages/Home.jsx:186
 msgid "Hand-picked properties just for you"
@@ -387,23 +434,32 @@ msgstr "घर"
 msgid "Houses"
 msgstr "घर"
 
-#: frontend/src/pages/Contact.jsx:131
+#: frontend/src/pages/Contact.jsx:132
 msgid "How can we help you?"
 msgstr "हम आपकी क्या मदद कर सकते हैं?"
+
+#: frontend/src/pages/Login.jsx:146
+msgid "Identity"
+msgstr ""
 
 #: frontend/src/pages/AdminDashboard.jsx:227
 #~ msgid "Images"
 #~ msgstr "छवियां"
 
-#: frontend/src/pages/PropertyDetails.jsx:456
+#: frontend/src/pages/Login.jsx:218
+#: frontend/src/pages/Signup.jsx:216
+msgid "Initialize Membership"
+msgstr ""
+
+#: frontend/src/pages/PropertyDetails.jsx:492
 msgid "Interest Rate"
 msgstr "ब्याज दर"
 
 #: frontend/src/pages/Login.jsx:26
-msgid "Invalid Credentials"
-msgstr "अमान्य क्रेडेंशियल"
+#~ msgid "Invalid Credentials"
+#~ msgstr "अमान्य क्रेडेंशियल"
 
-#: frontend/src/pages/AdminDashboard.jsx:573
+#: frontend/src/pages/AdminDashboard.jsx:590
 msgid "Inventory"
 msgstr "इन्वेंटरी"
 
@@ -424,8 +480,12 @@ msgid "John Doe"
 msgstr "जॉन डो"
 
 #: frontend/src/pages/Signup.jsx:53
-msgid "Join our community to find your perfect home."
-msgstr "अपना आदर्श घर खोजने के लिए हमारे समुदाय में शामिल हों।"
+#~ msgid "Join our community to find your perfect home."
+#~ msgstr "अपना आदर्श घर खोजने के लिए हमारे समुदाय में शामिल हों।"
+
+#: frontend/src/pages/Signup.jsx:148
+msgid "Join the Elite."
+msgstr ""
 
 #: frontend/src/pages/Home.jsx:216
 msgid "Join thousands of investors securing premium land and homes through our verified platform."
@@ -435,11 +495,15 @@ msgstr "हमारे सत्यापित प्लेटफॉर्म 
 msgid "Land"
 msgstr "जमीन"
 
-#: frontend/src/pages/AdminDashboard.jsx:601
+#: frontend/src/pages/Signup.jsx:105
+msgid "Legal Protection"
+msgstr ""
+
+#: frontend/src/pages/AdminDashboard.jsx:618
 msgid "Live Stats Connected"
 msgstr "लाइव आँकड़े जुड़े हुए हैं"
 
-#: frontend/src/pages/PropertyDetails.jsx:447
+#: frontend/src/pages/PropertyDetails.jsx:483
 msgid "Loan Amount"
 msgstr "ऋण राशि"
 
@@ -449,26 +513,28 @@ msgstr "ऋण राशि"
 msgid "Location"
 msgstr "स्थान"
 
-#: frontend/src/pages/AdminDashboard.jsx:975
+#: frontend/src/pages/AdminDashboard.jsx:992
 msgid "Location & Coordinates"
 msgstr "स्थान और निर्देशांक"
 
-#: frontend/src/pages/AdminDashboard.jsx:370
+#: frontend/src/pages/AdminDashboard.jsx:379
 msgid "Location not found. Try a different query."
 msgstr "स्थान नहीं मिला। कोई अन्य स्थान खोजें।"
 
-#: frontend/src/pages/AdminDashboard.jsx:368
+#: frontend/src/pages/AdminDashboard.jsx:377
 msgid "Location synced!"
 msgstr "स्थान सिंक हो गया!"
 
 #: frontend/src/components/Navbar.jsx:108
 #: frontend/src/components/Navbar.jsx:191
-#: frontend/src/pages/Login.jsx:80
-#: frontend/src/pages/Signup.jsx:100
 msgid "Login"
 msgstr "लॉगिन"
 
-#: frontend/src/pages/AdminDashboard.jsx:927
+#: frontend/src/pages/Login.jsx:169
+msgid "Lost Key?"
+msgstr ""
+
+#: frontend/src/pages/AdminDashboard.jsx:944
 msgid "Luxurious 3BHK in Downtown"
 msgstr "डाउनटाउन में शानदार 3BHK"
 
@@ -501,11 +567,11 @@ msgstr "अधिकतम बजट"
 msgid "Max Price"
 msgstr "अधिकतम कीमत"
 
-#: frontend/src/pages/PropertyDetails.jsx:285
+#: frontend/src/pages/PropertyDetails.jsx:286
 msgid "Media"
 msgstr "मीडिया"
 
-#: frontend/src/pages/Contact.jsx:21
+#: frontend/src/pages/Contact.jsx:22
 #: frontend/src/pages/Profile.jsx:87
 msgid "Message sent successfully!"
 msgstr "संदेश सफलतापूर्वक भेजा गया!"
@@ -518,11 +584,11 @@ msgstr "माइकल रॉस"
 msgid "Min Price"
 msgstr "न्यूनतम कीमत"
 
-#: frontend/src/pages/PropertyDetails.jsx:507
+#: frontend/src/pages/PropertyDetails.jsx:544
 msgid "Mobile Number"
 msgstr "मोबाइल नंबर"
 
-#: frontend/src/pages/PropertyDetails.jsx:474
+#: frontend/src/pages/PropertyDetails.jsx:510
 msgid "Monthly EMI"
 msgstr "मासिक ईएमआई"
 
@@ -534,21 +600,21 @@ msgstr "मासिक ईएमआई"
 #~ msgid "More"
 #~ msgstr "अधिक"
 
-#: frontend/src/pages/Listings.jsx:272
-msgid "Exclusive Collections"
-msgstr "विशेष संग्रह"
-
 #: frontend/src/pages/Listings.jsx:333
 msgid "New Arrivals"
 msgstr "नए आगमन"
 
 #: frontend/src/pages/Login.jsx:86
-msgid "New here?"
-msgstr "यहाँ नए हैं?"
+#~ msgid "New here?"
+#~ msgstr "यहाँ नए हैं?"
 
 #: frontend/src/components/PropertyCard.jsx:63
 msgid "New Property"
 msgstr "नई प्रॉपर्टी"
+
+#: frontend/src/pages/Login.jsx:213
+msgid "New to the network?"
+msgstr ""
 
 #: frontend/src/pages/Home.jsx:132
 msgid "Newest"
@@ -567,12 +633,12 @@ msgstr "कोई प्रॉपर्टी नहीं मिली।"
 #~ msgid "No properties matching your criteria."
 #~ msgstr "आपके मानदंडों से मेल खाने वाली कोई प्रॉपर्टी नहीं मिली।"
 
-#: frontend/src/pages/AdminDashboard.jsx:689
+#: frontend/src/pages/AdminDashboard.jsx:706
 msgid "No Reviews"
 msgstr "कोई समीक्षा नहीं"
 
 #: frontend/src/components/Footer.jsx:65
-#: frontend/src/pages/Contact.jsx:88
+#: frontend/src/pages/Contact.jsx:89
 msgid "Office Address"
 msgstr "कार्यालय का पता"
 
@@ -581,13 +647,13 @@ msgid "Oldest"
 msgstr "सबसे पुराना"
 
 #: frontend/src/pages/Login.jsx:72
-msgid "pass123"
-msgstr "pass123"
+#~ msgid "pass123"
+#~ msgstr "pass123"
 
 #: frontend/src/pages/Login.jsx:67
 #: frontend/src/pages/Signup.jsx:81
-msgid "Password"
-msgstr "पासवर्ड"
+#~ msgid "Password"
+#~ msgstr "पासवर्ड"
 
 #: frontend/src/pages/AdminDashboard.jsx:54
 #~ msgid "Permanent Delete?"
@@ -597,9 +663,13 @@ msgstr "पासवर्ड"
 #~ msgid "Permissions"
 #~ msgstr "अनुमतियां"
 
-#: frontend/src/pages/AdminDashboard.jsx:1099
+#: frontend/src/pages/AdminDashboard.jsx:1116
 msgid "Photos"
 msgstr "फोटो"
+
+#: frontend/src/pages/Login.jsx:139
+msgid "Please authenticate your identity to access your private real estate collection."
+msgstr ""
 
 #: frontend/src/pages/PropertyDetails.jsx:106
 msgid "Please enter your mobile number."
@@ -617,11 +687,11 @@ msgstr "विजिट का अनुरोध करने के लिए 
 msgid "Plots & Land"
 msgstr "प्लॉट और जमीन"
 
-#: frontend/src/pages/AdminDashboard.jsx:965
+#: frontend/src/pages/AdminDashboard.jsx:982
 msgid "Pool, Parking, Garden"
 msgstr "पूल, पार्किंग, गार्डन"
 
-#: frontend/src/pages/AdminDashboard.jsx:822
+#: frontend/src/pages/AdminDashboard.jsx:839
 msgid "Popularity Analytics (Views)"
 msgstr "लोकप्रियता विश्लेषण (व्यू)"
 
@@ -634,11 +704,11 @@ msgstr "पवंदीदा भाषा"
 msgid "Premium Collection"
 msgstr "प्रीमियम कलेक्शन"
 
-#: frontend/src/pages/PropertyDetails.jsx:491
+#: frontend/src/pages/PropertyDetails.jsx:528
 msgid "Price"
 msgstr "कीमत"
 
-#: frontend/src/pages/AdminDashboard.jsx:937
+#: frontend/src/pages/AdminDashboard.jsx:954
 msgid "Price (₹)"
 msgstr "कीमत (₹)"
 
@@ -678,7 +748,7 @@ msgstr "प्रॉपर्टी प्रबंधन"
 msgid "Property not found"
 msgstr "प्रॉपर्टी नहीं मिली"
 
-#: frontend/src/pages/AdminDashboard.jsx:432
+#: frontend/src/pages/AdminDashboard.jsx:449
 msgid "Property Published Successfully!"
 msgstr "प्रॉपर्टी सफलतापूर्वक प्रकाशित हुई!"
 
@@ -691,8 +761,8 @@ msgstr "प्रॉपर्टी टूर"
 msgid "Property Type"
 msgstr "प्रॉपर्टी का प्रकार"
 
-#: frontend/src/pages/AdminDashboard.jsx:917
-#: frontend/src/pages/AdminDashboard.jsx:1151
+#: frontend/src/pages/AdminDashboard.jsx:934
+#: frontend/src/pages/AdminDashboard.jsx:1168
 msgid "Publish Property"
 msgstr "प्रॉपर्टी प्रकाशित करें"
 
@@ -704,7 +774,7 @@ msgstr "त्रिज्या (दायरा)"
 msgid "Rate your experience"
 msgstr "अपने अनुभव को रेटिंग दें"
 
-#: frontend/src/pages/AdminDashboard.jsx:669
+#: frontend/src/pages/AdminDashboard.jsx:686
 msgid "Rating"
 msgstr "रेटिंग"
 
@@ -713,13 +783,17 @@ msgstr "रेटिंग"
 msgid "Redefined"
 msgstr "पुनर्परिभाषित"
 
-#: frontend/src/pages/AdminDashboard.jsx:1164
+#: frontend/src/pages/AdminDashboard.jsx:1181
 msgid "Registered members"
 msgstr "पंजीकृत सदस्य"
 
 #: frontend/src/pages/Signup.jsx:33
-msgid "Registration failed"
-msgstr "पंजीकरण विफल रहा"
+#~ msgid "Registration failed"
+#~ msgstr "पंजीकरण विफल रहा"
+
+#: frontend/src/pages/Signup.jsx:43
+msgid "Registration failed. Please try again."
+msgstr ""
 
 #: frontend/src/components/Testimonials.jsx:22
 #~ msgid "Regular Client"
@@ -729,7 +803,7 @@ msgstr "पंजीकरण विफल रहा"
 msgid "Repeat Client"
 msgstr "दोबारा आने वाले ग्राहक"
 
-#: frontend/src/pages/PropertyDetails.jsx:524
+#: frontend/src/pages/PropertyDetails.jsx:557
 msgid "Request Visit"
 msgstr "विजिट का अनुरोध करें"
 
@@ -741,7 +815,7 @@ msgstr "विजिट का अनुरोध करें"
 #~ msgid "Requires location text (e.g., Chennai)"
 #~ msgstr "स्थान टेक्स्ट आवश्यक है (उदा. चेन्नई)"
 
-#: frontend/src/pages/AdminDashboard.jsx:688
+#: frontend/src/pages/AdminDashboard.jsx:705
 msgid "Reviews"
 msgstr "समीक्षाएं"
 
@@ -778,7 +852,7 @@ msgstr "शहर, क्षेत्र या प्रोजेक्ट क�
 #~ msgid "Search by location..."
 #~ msgstr "स्थान के अनुसार खोजें..."
 
-#: frontend/src/pages/AdminDashboard.jsx:1176
+#: frontend/src/pages/AdminDashboard.jsx:1193
 msgid "Search by name or email..."
 msgstr "नाम या ईमेल से खोजें..."
 
@@ -786,7 +860,7 @@ msgstr "नाम या ईमेल से खोजें..."
 #~ msgid "Search city or neighborhood..."
 #~ msgstr "शहर या पड़ोस खोजें..."
 
-#: frontend/src/pages/AdminDashboard.jsx:981
+#: frontend/src/pages/AdminDashboard.jsx:998
 msgid "Search Location..."
 msgstr "स्थान खोजें..."
 
@@ -794,17 +868,33 @@ msgstr "स्थान खोजें..."
 msgid "Search Results"
 msgstr "खोज परिणाम"
 
+#: frontend/src/pages/Login.jsx:102
+msgid "Secure Assets"
+msgstr ""
+
+#: frontend/src/pages/Login.jsx:203
+msgid "Secure Login"
+msgstr ""
+
 #: frontend/src/pages/Profile.jsx:259
 msgid "Security & Access"
 msgstr "सुरक्षा और एक्सेस"
 
-#: frontend/src/pages/Contact.jsx:140
+#: frontend/src/pages/Signup.jsx:183
+msgid "Security Password"
+msgstr ""
+
+#: frontend/src/pages/Contact.jsx:141
 msgid "Send Message"
 msgstr "संदेश भेजें"
 
+#: frontend/src/pages/Signup.jsx:231
+msgid "Sign In"
+msgstr ""
+
 #: frontend/src/pages/Login.jsx:45
-msgid "Sign in to manage your properties"
-msgstr "अपनी संपत्तियों को प्रबंधित करने के लिए साइन इन करें"
+#~ msgid "Sign in to manage your properties"
+#~ msgstr "अपनी संपत्तियों को प्रबंधित करने के लिए साइन इन करें"
 
 #: frontend/src/components/Navbar.jsx:182
 #: frontend/src/pages/Profile.jsx:469
@@ -812,11 +902,11 @@ msgid "Sign Out"
 msgstr "साइन आउट"
 
 #: frontend/src/pages/Signup.jsx:92
-msgid "Sign Up"
-msgstr "साइन अप करें"
+#~ msgid "Sign Up"
+#~ msgstr "साइन अप करें"
 
 #: frontend/src/pages/PropertyDetails.jsx:208
-#: frontend/src/pages/PropertyDetails.jsx:401
+#: frontend/src/pages/PropertyDetails.jsx:439
 msgid "Size"
 msgstr "आकार"
 
@@ -824,19 +914,19 @@ msgstr "आकार"
 #~ msgid "Size (sqft/acre)"
 #~ msgstr "आकार (वर्ग फुट/एकड़)"
 
-#: frontend/src/pages/AdminDashboard.jsx:1037
+#: frontend/src/pages/AdminDashboard.jsx:1054
 msgid "Size (sqft/Acres)"
 msgstr "आकार (वर्ग फुट/एकड़)"
 
-#: frontend/src/pages/AdminDashboard.jsx:638
+#: frontend/src/pages/AdminDashboard.jsx:655
 msgid "Sold Value"
 msgstr "बेची गई कीमत"
 
-#: frontend/src/pages/PropertyDetails.jsx:409
+#: frontend/src/pages/PropertyDetails.jsx:447
 msgid "Status"
 msgstr "स्थिति"
 
-#: frontend/src/pages/AdminDashboard.jsx:140
+#: frontend/src/pages/AdminDashboard.jsx:149
 msgid "Status updated to {newStatus}"
 msgstr "स्थिति बदलकर {newStatus} कर दी गई"
 
@@ -844,13 +934,17 @@ msgstr "स्थिति बदलकर {newStatus} कर दी गई"
 #~ msgid "Structure"
 #~ msgstr "संरचना"
 
-#: frontend/src/pages/Contact.jsx:124
+#: frontend/src/pages/Contact.jsx:125
 msgid "Subject"
 msgstr "विषय"
 
 #: frontend/src/pages/AdminDashboard.jsx:185
 #~ msgid "Success! Property Published."
 #~ msgstr "सफलता! प्रॉपर्टी प्रकाशित हो गई।"
+
+#: frontend/src/pages/PropertyDetails.jsx:386
+msgid "Swipe to explore"
+msgstr ""
 
 #: frontend/src/pages/Profile.jsx:262
 msgid "System Identity"
@@ -861,7 +955,7 @@ msgstr "सिस्टम पहचान"
 msgid "Tamil"
 msgstr "तमिल"
 
-#: frontend/src/pages/PropertyDetails.jsx:465
+#: frontend/src/pages/PropertyDetails.jsx:501
 msgid "Tenure (Years)"
 msgstr "अवधि (वर्ष)"
 
@@ -873,15 +967,15 @@ msgstr "अवधि (वर्ष)"
 msgid "The team helped me find my dream home in a prime location. Excellent service!"
 msgstr "टीम ने मुझे एक प्रमुख स्थान पर मेरा सपनों का घर ढूंढने में मदद की। उत्कृष्ट सेवा!"
 
-#: frontend/src/pages/AdminDashboard.jsx:192
+#: frontend/src/pages/AdminDashboard.jsx:201
 msgid "This action is permanent and will remove all user data."
 msgstr "यह कार्रवाई स्थायी है और सभी यूजर डेटा को हटा देगी।"
 
-#: frontend/src/pages/AdminDashboard.jsx:926
+#: frontend/src/pages/AdminDashboard.jsx:943
 msgid "Title"
 msgstr "शीर्षक"
 
-#: frontend/src/pages/AdminDashboard.jsx:880
+#: frontend/src/pages/AdminDashboard.jsx:897
 msgid "Top Property Insights"
 msgstr "टॉप प्रॉपर्टी इनसाइट्स"
 
@@ -889,12 +983,12 @@ msgstr "टॉप प्रॉपर्टी इनसाइट्स"
 #~ msgid "Total Area"
 #~ msgstr "कुल क्षेत्रफल"
 
-#: frontend/src/pages/PropertyDetails.jsx:479
+#: frontend/src/pages/PropertyDetails.jsx:515
 msgid "Total Interest"
 msgstr "कुल ब्याज"
 
-#: frontend/src/pages/AdminDashboard.jsx:657
-#: frontend/src/pages/AdminDashboard.jsx:869
+#: frontend/src/pages/AdminDashboard.jsx:674
+#: frontend/src/pages/AdminDashboard.jsx:886
 msgid "Total Views"
 msgstr "कुल व्यू"
 
@@ -902,8 +996,8 @@ msgstr "कुल व्यू"
 msgid "Trending Now"
 msgstr "अभी ट्रेंडिंग में"
 
-#: frontend/src/pages/AdminDashboard.jsx:1048
-#: frontend/src/pages/PropertyDetails.jsx:404
+#: frontend/src/pages/AdminDashboard.jsx:1065
+#: frontend/src/pages/PropertyDetails.jsx:442
 msgid "Type"
 msgstr "प्रकार"
 
@@ -911,19 +1005,19 @@ msgstr "प्रकार"
 msgid "Under Market Deals"
 msgstr "मार्केट रेट से कम की डील"
 
-#: frontend/src/pages/AdminDashboard.jsx:312
+#: frontend/src/pages/AdminDashboard.jsx:321
 msgid "Updating status..."
 msgstr "स्थिति अपडेट की जा रही है..."
 
-#: frontend/src/pages/AdminDashboard.jsx:422
+#: frontend/src/pages/AdminDashboard.jsx:431
 msgid "Uploading property and media..."
 msgstr "प्रॉपर्टी और मीडिया अपलोड किया जा रहा है..."
 
-#: frontend/src/pages/AdminDashboard.jsx:1151
+#: frontend/src/pages/AdminDashboard.jsx:1168
 msgid "Uploading..."
 msgstr "अपलोड किया जा रहा है..."
 
-#: frontend/src/pages/AdminDashboard.jsx:1162
+#: frontend/src/pages/AdminDashboard.jsx:1179
 msgid "User Directory"
 msgstr "यूजर डायरेक्टरी"
 
@@ -936,7 +1030,7 @@ msgstr "यूजर डायरेक्टरी"
 #~ msgstr "सत्यापन"
 
 #: frontend/src/pages/Profile.jsx:271
-#: frontend/src/pages/PropertyDetails.jsx:410
+#: frontend/src/pages/PropertyDetails.jsx:448
 msgid "Verified"
 msgstr "सत्यापित"
 
@@ -948,7 +1042,7 @@ msgstr "सत्यापित संपत्तियां"
 msgid "Verified properties and professional guidance. My future is secure."
 msgstr "सत्यापित संपत्तियाँ और पेशेवर मार्गदर्शन। मेरा भविष्य सुरक्षित है।"
 
-#: frontend/src/pages/AdminDashboard.jsx:1131
+#: frontend/src/pages/AdminDashboard.jsx:1148
 msgid "Videos"
 msgstr "वीडियो"
 
@@ -957,11 +1051,15 @@ msgstr "वीडियो"
 msgid "View All"
 msgstr "सभी देखें"
 
+#: frontend/src/pages/PropertyDetails.jsx:419
+msgid "View All Media"
+msgstr ""
+
 #: frontend/src/pages/Listings.jsx:347
 msgid "View All Properties"
 msgstr "सभी प्रॉपर्टीज देखें"
 
-#: frontend/src/pages/AdminDashboard.jsx:840
+#: frontend/src/pages/AdminDashboard.jsx:857
 msgid "Views"
 msgstr "व्यू"
 
@@ -973,23 +1071,27 @@ msgstr "व्यू"
 msgid "Visit request sent! We will contact you soon."
 msgstr "विजिट अनुरोध भेज दिया गया है! हम जल्द ही आपसे संपर्क करेंगे।"
 
-#: frontend/src/pages/AdminDashboard.jsx:591
+#: frontend/src/pages/AdminDashboard.jsx:608
 msgid "Visits"
 msgstr "विजिट"
 
-#: frontend/src/pages/Contact.jsx:41
+#: frontend/src/pages/Contact.jsx:42
 msgid "We are here to help you find your next big investment."
 msgstr "हम आपके अगले बड़े निवेश को खोजने में आपकी मदद करने के लिए यहाँ हैं।"
 
 #: frontend/src/pages/Login.jsx:41
-msgid "Welcome Back"
-msgstr "वापसी पर स्वागत है"
+#~ msgid "Welcome Back"
+#~ msgstr "वापसी पर स्वागत है"
+
+#: frontend/src/pages/Login.jsx:136
+msgid "Welcome Back."
+msgstr ""
 
 #: frontend/src/pages/Profile.jsx:339
 msgid "Wishlist"
 msgstr "विशलिस्ट"
 
-#: frontend/src/pages/AdminDashboard.jsx:196
+#: frontend/src/pages/AdminDashboard.jsx:205
 msgid "Yes, delete"
 msgstr "हाँ, हटाएं"
 

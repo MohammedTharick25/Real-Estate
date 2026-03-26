@@ -1,18 +1,79 @@
-# React + Vite
+# 🏰 Estatera — Luxury Living Redefined
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Project Status: Active](https://img.shields.io/badge/Project%20Status-Active-brightgreen.svg)](https://real-estate-51c8.onrender.com)
+[![Framework: React 19](https://img.shields.io/badge/Framework-React%2019-blue.svg)](https://react.dev/)
+[![Backend: Node.js](https://img.shields.io/badge/Backend-Node.js-orange.svg)](https://nodejs.org/)
+[![Database: MongoDB](https://img.shields.io/badge/Database-MongoDB-green.svg)](https://www.mongodb.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Currently, two official plugins are available:
+**Estatera** is an elite, full-stack real estate ecosystem designed for high-net-worth investors and premium property seekers. Combining a cinematic front-end experience with a robust executive administrative suite, Estatera streamlines the journey from property discovery to legal acquisition.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ World-Class Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+### 🏢 Premium Property Ecosystem
 
-Note: This will impact Vite dev & build performances.
+- **Cinematic Discovery:** High-performance bento-grid (Desktop) and swipe-gallery (Mobile) media displays for immersive architectural viewing.
+- **Interactive Cartography:** Precision geolocation using LocationIQ and Leaflet, allowing users to explore land boundaries and neighborhood contexts.
+- **Dynamic PDF Brochure Engine:** Instant, client-side generation of professional "Fact Sheets" using `jsPDF` for offline viewing.
+- **Intelligent Search:** Advanced multi-filter logic including Geospatial radius search, price thresholds, and categorized property types.
 
-## Expanding the ESLint configuration
+### 👔 Executive Administrative Suite (BI)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Business Intelligence Dashboard:** Real-time analytics powered by `Recharts` visualizing revenue trends, inventory share, and property popularity.
+- **Automated Marketing Engine:** Extraordinary transactional property alerts sent via **Brevo API** to all active members using personalized, high-conversion HTML templates.
+- **Community Governance:** Full user lifecycle management including a "Security Heartbeat" that terminates blocked sessions in real-time.
+- **Intelligence Reports:** One-click export of business performance data to CSV and professional-grade PDF formats.
+
+### 🛡️ Enterprise-Grade Infrastructure
+
+- **PWA Architecture:** Fully installable mobile experience with custom Service Workers for "App-like" performance and standalone UI.
+- **Security First:** JWT-based authentication, "Master Admin" account protection protocols, and real-time status synchronization.
+- **Global Readiness:** Multi-language support (English, Tamil, Hindi) using **Lingui i18n** for international market reach.
+- **SEO & Social Mastery:** Advanced **JSON-LD Structured Data** and optimized Open Graph/WhatsApp metadata for "Gold Standard" search engine visibility.
+
+---
+
+## 🚀 Tech Stack
+
+| Layer         | Technologies                                                               |
+| :------------ | :------------------------------------------------------------------------- |
+| **Frontend**  | React 19, Vite, Tailwind CSS 4, Framer Motion, Axios, Lingui i18n          |
+| **Backend**   | Node.js, Express 5, Socket.io (Real-time Events), JWT                      |
+| **Database**  | MongoDB (Mongoose ODM)                                                     |
+| **Cloud/API** | Cloudinary (Media), Brevo (Email API), LocationIQ (Maps), Render (Hosting) |
+
+---
+
+## 📈 Performance Engineering
+
+**Network Optimization**: Utilizes family: 4 forced IPv4 routing for high-reliability cloud deployment on Render.
+**Efficient Rendering**: Memoized financial calculations and staggered Framer Motion animations to ensure 60fps UI performance.
+**Smart Caching**: Service Worker implementation for asset caching and "Network-first" API strategies.
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] AI-Powered property value appreciation estimator
+- [ ] 360° Virtual Reality property tours using WebGL
+- [ ] In-app secure document vault and e-signature integration
+- [ ] Direct agent-to-user live chat via Socket.io
+
+---
+
+## 👨‍💻 Author
+
+**Mohammed Tharick**
+Lead Full-Stack Architect
+
+![alt text](https://img.shields.io/badge/Portfolio-Visit%20Site-blue?style=flat-square)
+
+![alt text](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)
+
+---
+
+<p align="center">
+  <sub>Estatera — Architecture is the background of life.</sub>
+</p>
